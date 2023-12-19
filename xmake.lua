@@ -1,0 +1,15 @@
+add_rules("mode.debug", "mode.release")
+
+target("the_puzzle")
+    add_rules("qt.widgetapp")
+    add_frameworks("QtMultimedia")
+    add_headerfiles("src/main/*.h")
+    add_files("src/main/*.cc")
+    add_files("src/core/*.cc")
+    add_files("src/main/mainwindow.ui")
+    -- add files with Q_OBJECT meta (only for qt.moc)
+    add_files("src/main/mainwindow.h")
+
+    after_build(function (target)
+        os.cp("src/res", target:targetdir())
+    end)
