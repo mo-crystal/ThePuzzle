@@ -12,9 +12,31 @@ Scene::~Scene()
   {
     delete scene_buttons[i];
   }
-  
 }
 
-void Scene::AddSceneButton(SceneButton* s){
+void Scene::AddSceneButton(SceneButton *s)
+{
   this->scene_buttons.push_back(s);
+  s->GetButton()->setVisible(sceneVisable);
+  s->GetLabel()->setVisible(sceneVisable);
+}
+
+void Scene::SceneDisappear()
+{
+  sceneVisable = 0;
+  for (int i = 0; i < scene_buttons.size(); i++)
+  {
+    scene_buttons[i]->GetButton()->setVisible(0);
+    scene_buttons[i]->GetLabel()->setVisible(0);
+  }
+}
+
+void Scene::SceneShow()
+{
+  sceneVisable = 1;
+  for (int i = 0; i < scene_buttons.size(); i++)
+  {
+    scene_buttons[i]->GetButton()->setVisible(1);
+    scene_buttons[i]->GetLabel()->setVisible(1);
+  }
 }

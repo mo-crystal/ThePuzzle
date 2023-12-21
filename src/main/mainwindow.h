@@ -13,11 +13,13 @@
 #include <QPainter>
 #include <QMovie>
 #include <QDebug>
-
+#include <QMessageBox>
 #include <QMediaPlaylist>
 #include <QMediaPlayer>
 #include <QMouseEvent>
 #include <QTimer>
+
+#include "../core/scene.h"
 
 #define DEFUALT_WIDTH 960
 #define DEFUALT_HEIGHT 640
@@ -41,6 +43,8 @@ class MainWindow : public QMainWindow
   Q_OBJECT
 
 public:
+  std::string nowScene;
+
   explicit MainWindow(QWidget *parent = 0);
   ~MainWindow();
   void paintEvent(QPaintEvent *event);
@@ -49,16 +53,16 @@ public:
   void keyReleaseEvent(QKeyEvent *event);
   void handleDelayedKeyRelease();
   void mousePressEvent(QMouseEvent *event);
-
+  void AddScene(std::string name, Scene *, bool default_scene = 0);
   void Init();
 
 private:
   Ui::MainWindow *ui;
+  std::map<std::string, Scene *> Scenes;
 
   bool isplaying = false;
-  
+  int FLASHTIMER;
 private slots:
-
 };
 
 #endif // MAINWINDOW_H
