@@ -55,7 +55,10 @@ public:
   void mousePressEvent(QMouseEvent *event);
   void AddScene(std::string name, Scene *, bool default_scene = 0);
   void Init();
-
+  void Room1Init();
+  void Room2Init();
+  void Room3Init();
+  void Room4Init();
 private:
   Ui::MainWindow *ui;
   std::map<std::string, Scene *> Scenes;
