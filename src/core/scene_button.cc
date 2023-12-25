@@ -1,11 +1,13 @@
 #include "scene_button.h"
 
-SceneButton::SceneButton(double _x, double _y, double _size_x, double _size_y, std::string _path, std::function<void()> _onClick, QWidget *parent)
+SceneButton::SceneButton(double _x, double _y, double _size_x, double _size_y, std::string _name, std::string _path, std::function<void()> _onClick, QWidget *parent, std::function<void()> _ondefine)
+    : QWidget(parent)
 {
   this->x = _x;
   this->y = _y;
   this->size_x = _size_x;
   this->size_y = _size_y;
+  this->name = _name;
   this->path = _path;
   this->onClick = _onClick;
   QPixmap p(QString::fromStdString(path));
@@ -34,14 +36,18 @@ SceneButton::SceneButton(double _x, double _y, double _size_x, double _size_y, s
   // 连接按钮的 clicked() 信号与 onClick 槽函数
   QObject::connect(button, &QPushButton::clicked, onClick);
   movie->start();
+  _ondefine();
 }
 
-SceneButton::SceneButton(double _x, double _y, std::string _path, std::function<void()> _onClick, QWidget *parent)
+SceneButton::SceneButton(double _x, double _y, std::string _name, std::string _path, std::function<void()> _onClick, QWidget *parent, std::function<void()> _ondefine)
+    : QWidget(parent)
 {
   this->x = _x;
   this->y = _y;
   this->path = _path;
   this->onClick = _onClick;
+  this->name = _name;
+
   QPixmap p(QString::fromStdString(path));
 
   this->size_x = p.width();
@@ -71,6 +77,7 @@ SceneButton::SceneButton(double _x, double _y, std::string _path, std::function<
   // 连接按钮的 clicked() 信号与 onClick 槽函数
   QObject::connect(button, &QPushButton::clicked, onClick);
   movie->start();
+  _ondefine();
 }
 
 SceneButton::~SceneButton()
@@ -79,3 +86,4 @@ SceneButton::~SceneButton()
   delete label;
   delete movie;
 }
+

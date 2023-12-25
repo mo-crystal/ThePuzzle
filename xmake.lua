@@ -9,6 +9,7 @@ target("the_puzzle")
     add_files("src/main/mainwindow.ui")
     -- add files with Q_OBJECT meta (only for qt.moc)
     add_files("src/main/mainwindow.h")
+    add_files("src/core/scene_button.h")
 
     after_build(function (target)
         os.cp("src/res", target:targetdir())

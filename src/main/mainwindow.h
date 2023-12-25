@@ -24,15 +24,8 @@
 #define DEFUALT_WIDTH 960
 #define DEFUALT_HEIGHT 640
 #define DEFUALT_HEIGHT_TOOLBAR 60
-#define BLOCK_SIZE 64
 #define START_PAGE_BUTTON_WIDTH DEFUALT_WIDTH / 6
-#define DECORATE_SIZE 32
-#define MAP_WIDTH 256
-#define MAP_HEIGHT 256
-#define UP 1
-#define RIGHT 2
-#define DOWN 3
-#define LEFT 4
+#define TOOLBAR_SIZE 14
 
 namespace Ui
 {
@@ -60,10 +53,14 @@ public:
   void Room2Init();
   void Room3Init();
   void Room4Init();
+
 private:
   Ui::MainWindow *ui;
   std::map<std::string, Scene *> Scenes;
-
+  std::vector<SceneButton *> toolbar;
+  std::vector<std::string> bag;
+  int page = 0;
+  std::string inhand = "";
   bool isplaying = false;
   int FLASHTIMER;
 private slots:
