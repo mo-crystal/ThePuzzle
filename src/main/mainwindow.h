@@ -53,6 +53,7 @@ public:
   void Room2Init();
   void Room3Init();
   void Room4Init();
+  void ToolbarRefresh();
 
 private:
   Ui::MainWindow *ui;

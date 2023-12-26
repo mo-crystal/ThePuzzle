@@ -1,6 +1,6 @@
 #include "scene_button.h"
 
-SceneButton::SceneButton(double _x, double _y, double _size_x, double _size_y, std::string _name, std::string _path, std::function<void()> _onClick, QWidget *parent, std::function<void()> _ondefine)
+SceneButton::SceneButton(double _x, double _y, double _size_x, double _size_y, std::string _name, std::string _path, std::function<void(SceneButton &)> _onClick, QWidget *parent)
     : QWidget(parent)
 {
   this->x = _x;
@@ -34,12 +34,13 @@ SceneButton::SceneButton(double _x, double _y, double _size_x, double _size_y, s
       
     } });
   // 连接按钮的 clicked() 信号与 onClick 槽函数
-  QObject::connect(button, &QPushButton::clicked, onClick);
+  QObject::connect(button, &QPushButton::clicked, this, [this]()
+                   { emit clicked(*this); });
+  QObject::connect(this, &SceneButton::clicked, onClick);
   movie->start();
-  _ondefine();
 }
 
-SceneButton::SceneButton(double _x, double _y, std::string _name, std::string _path, std::function<void()> _onClick, QWidget *parent, std::function<void()> _ondefine)
+SceneButton::SceneButton(double _x, double _y, std::string _name, std::string _path, std::function<void(SceneButton &)> _onClick, QWidget *parent)
     : QWidget(parent)
 {
   this->x = _x;
@@ -75,9 +76,10 @@ SceneButton::SceneButton(double _x, double _y, std::string _name, std::string _p
       
     } });
   // 连接按钮的 clicked() 信号与 onClick 槽函数
-  QObject::connect(button, &QPushButton::clicked, onClick);
+  QObject::connect(button, &QPushButton::clicked, this, [this]()
+                   { emit clicked(*this); });
+  QObject::connect(this, &SceneButton::clicked, onClick);
   movie->start();
-  _ondefine();
 }
 
 SceneButton::~SceneButton()
@@ -87,3 +89,38 @@ SceneButton::~SceneButton()
   delete movie;
 }
 
+void SceneButton::LocationReset()
+{
+  label->move(x, y);
+  button->move(x, y);
+}
+
+void SceneButton::SetValid(bool s)
+{
+  valid = s;
+  if (!s)
+  {
+    button->hide();
+    label->hide();
+  }
+}
+
+void SceneButton::SetPath(std::string _path)
+{
+  path = _path;
+  delete movie;
+  QPixmap p(QString::fromStdString(path));
+
+  movie = new QMovie(QString::fromStdString(path));
+  label->setMovie(movie);
+
+  QString background_image = "image: url(" + QString::fromStdString(path) + ");";
+  QString style_sheet = "background-color: rgba(255, 255, 255, 0);";
+  label->setAttribute(Qt::WA_TranslucentBackground);
+  label->setFixedSize(p.width(), p.height());
+  label->move(x, y);
+
+  button->setStyleSheet(style_sheet);
+
+  movie->start();
+}

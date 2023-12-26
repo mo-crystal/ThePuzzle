@@ -55,20 +55,23 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 void MainWindow::Init()
 {
   std::string temp_name = "";
+  std::string temp_path = "";
   for (int i = 0; i < TOOLBAR_SIZE; i++)
   {
     if (page * 14 + i < bag.size())
     {
       temp_name = bag[page * 14 + i];
+      temp_path = "./res/items/" + temp_name + ".png";
+      QMessageBox::information(this, "", QString::fromStdString(temp_path));
     }
     SceneButton *temp = new SceneButton(
-        36 + i * (8 + 56), 644, 56, 56, "", "", [temp_name, this]()
-        {inhand=temp_name;
+        36 + i * (8 + 56), 644, 56, 56, temp_name, temp_path, [temp_name, this](SceneButton &obj)
+        {inhand=obj.GetName();
         QMessageBox::information(this,"",QString::fromStdString(inhand)); },
         this);
     toolbar.push_back(temp);
   }
-
+  ToolbarRefresh();
   Room1Init();
   Room2Init();
   Room3Init();
@@ -100,7 +103,7 @@ void MainWindow::Room1Init()
 
   SceneButton *s1_desk = new SceneButton(
       0, 360, "desk", "./res/scene1_desk.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         Scenes[nowScene]->SceneDisappear();
         nowScene = "scene_desk";
@@ -111,7 +114,7 @@ void MainWindow::Room1Init()
 
   SceneButton *s1_computer = new SceneButton(
       123, 320, "computer", "./res/scene1_computer.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         QMessageBox::information(this, "", "computer");
       },
@@ -120,7 +123,7 @@ void MainWindow::Room1Init()
 
   SceneButton *s1_bed = new SceneButton(
       596, 408, "bed", "./res/scene1_bed.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         Scenes[nowScene]->SceneDisappear();
         nowScene = "scene1_nightstand";
@@ -131,7 +134,7 @@ void MainWindow::Room1Init()
 
   SceneButton *s1_nightstand = new SceneButton(
       844, 508, "nightstand", "./res/scene1_nightstand.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         Scenes[nowScene]->SceneDisappear();
         nowScene = "scene1_nightstand";
@@ -142,7 +145,7 @@ void MainWindow::Room1Init()
 
   SceneButton *s1_plant = new SceneButton(
       39, 310, "plant", "./res/scene1_plant.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         QMessageBox::information(this, "", "plant");
       },
@@ -151,7 +154,7 @@ void MainWindow::Room1Init()
 
   SceneButton *s1_window = new SceneButton(
       239, 124, "window", "./res/scene1_window.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         QMessageBox::information(this, "", "window");
       },
@@ -160,7 +163,7 @@ void MainWindow::Room1Init()
 
   SceneButton *left = new SceneButton(
       10, 340, "left", "./res/left_arrow.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         Scenes[nowScene]->SceneDisappear();
         nowScene = "scene3";
@@ -171,7 +174,7 @@ void MainWindow::Room1Init()
 
   SceneButton *right = new SceneButton(
       900, 340, "right", "./res/right_arrow.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         Scenes[nowScene]->SceneDisappear();
         nowScene = "scene1";
@@ -185,7 +188,7 @@ void MainWindow::Room1Init()
 
   SceneButton *scene_desk_return_button = new SceneButton(
       448, 580, "down_arrow", "./res/down_arrow.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         Scenes[nowScene]->SceneDisappear();
         nowScene = "scene";
@@ -202,7 +205,7 @@ void MainWindow::Room2Init()
 
   SceneButton *bed = new SceneButton(
       0, 360, "bed", "./res/scene2_bed.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         Scenes[nowScene]->SceneDisappear();
         nowScene = "scene1_nightstand";
@@ -213,7 +216,7 @@ void MainWindow::Room2Init()
 
   SceneButton *nightstand = new SceneButton(
       212, 408, "nightstand", "./res/scene2_nightstand.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         Scenes[nowScene]->SceneDisappear();
         nowScene = "scene1_nightstand";
@@ -224,7 +227,7 @@ void MainWindow::Room2Init()
 
   SceneButton *shelf = new SceneButton(
       300, 164, "shelf", "./res/scene2_shelf.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         Scenes[nowScene]->SceneDisappear();
         nowScene = "scene1_shelf";
@@ -235,7 +238,7 @@ void MainWindow::Room2Init()
 
   SceneButton *waterpot = new SceneButton(
       418, 132, "waterpot", "./res/scene2_waterpot.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         Scenes[nowScene]->SceneDisappear();
         nowScene = "scene1_shelf";
@@ -246,7 +249,7 @@ void MainWindow::Room2Init()
 
   SceneButton *plant = new SceneButton(
       340, 148, "plant", "./res/scene2_plant.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         Scenes[nowScene]->SceneDisappear();
         nowScene = "scene1_shelf";
@@ -257,7 +260,7 @@ void MainWindow::Room2Init()
 
   SceneButton *paint = new SceneButton(
       636, 100, "paint", "./res/scene2_paint_state1.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         QMessageBox::information(this, "scene2", "paint");
       },
@@ -266,7 +269,7 @@ void MainWindow::Room2Init()
 
   SceneButton *left = new SceneButton(
       10, 340, "left", "./res/left_arrow.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         Scenes[nowScene]->SceneDisappear();
         nowScene = "scene";
@@ -277,7 +280,7 @@ void MainWindow::Room2Init()
 
   SceneButton *right = new SceneButton(
       900, 340, "right", "./res/right_arrow.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         Scenes[nowScene]->SceneDisappear();
         nowScene = "scene2";
@@ -291,7 +294,7 @@ void MainWindow::Room2Init()
 
   SceneButton *scene1_shelf_return_button = new SceneButton(
       448, 580, "down_arrow", "./res/down_arrow.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         Scenes[nowScene]->SceneDisappear();
         nowScene = "scene1";
@@ -305,22 +308,42 @@ void MainWindow::Room2Init()
 
   SceneButton *scene1_nightstand_bed = new SceneButton(
       0, 104, "nightstand_bed", "./res/scene2_nightstand_bed.png",
-      []() {
+      [](SceneButton &obj) {
       },
       this);
   scene1_nightstand->AddSceneButton(scene1_nightstand_bed);
 
+  SceneButton *scene1_nightstand_key = new SceneButton(
+      56, 364, "nightstand_key", "./res/scene2_nightstand_key.png",
+      [&, this](SceneButton &obj)
+      {
+        bag.push_back("key");
+        ToolbarRefresh();
+        obj.SetValid(false);
+      },
+      this);
+  scene1_nightstand->AddSceneButton(scene1_nightstand_key);
+
   SceneButton *scene1_nightstand_pillow = new SceneButton(
       6, 336, "nightstand_pillow", "./res/scene2_nightstand_pillow.png",
-      [&, this]() { 
-        QMessageBox::information(this, "scene2", "pillow");
+      [this](SceneButton &obj)
+      {
+        if (!obj.IsMoved())
+        {
+          obj.GetButton()->move(6, 100);
+          obj.GetLabel()->move(6, 100);
+        }
+        else
+        {
+          obj.LocationReset();
+        }
       },
       this);
   scene1_nightstand->AddSceneButton(scene1_nightstand_pillow);
 
   SceneButton *scene1_nightstand_return_button = new SceneButton(
       448, 580, "down_arrow", "./res/down_arrow.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         Scenes[nowScene]->SceneDisappear();
         nowScene = "scene1";
@@ -337,7 +360,7 @@ void MainWindow::Room3Init()
   AddScene("scene2", scene2);
   SceneButton *left = new SceneButton(
       10, 340, "left_arrow", "./res/left_arrow.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         Scenes[nowScene]->SceneDisappear();
         nowScene = "scene1";
@@ -348,7 +371,7 @@ void MainWindow::Room3Init()
 
   SceneButton *right = new SceneButton(
       900, 340, "right_arrow", "./res/right_arrow.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         Scenes[nowScene]->SceneDisappear();
         nowScene = "scene3";
@@ -364,7 +387,7 @@ void MainWindow::Room4Init()
   AddScene("scene3", scene3);
   SceneButton *left = new SceneButton(
       10, 340, "left_arrow", "./res/left_arrow.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         Scenes[nowScene]->SceneDisappear();
         nowScene = "scene2";
@@ -375,7 +398,7 @@ void MainWindow::Room4Init()
 
   SceneButton *right = new SceneButton(
       900, 340, "right_arrow", "./res/right_arrow.png",
-      [&, this]()
+      [&, this](SceneButton &obj)
       {
         Scenes[nowScene]->SceneDisappear();
         nowScene = "scene";
@@ -383,4 +406,20 @@ void MainWindow::Room4Init()
       },
       this);
   scene3->AddSceneButton(right);
+}
+
+void MainWindow::ToolbarRefresh()
+{
+  std::string temp_name = "";
+  std::string temp_path = "";
+  for (int i = 0; i < TOOLBAR_SIZE; i++)
+  {
+    if (page * 14 + i < bag.size())
+    {
+      temp_name = bag[page * 14 + i];
+      temp_path = "./res/items/" + temp_name + ".png";
+      toolbar[i]->SetPath(temp_path);
+      toolbar[i]->SetName(temp_name);
+    }
+  }
 }
