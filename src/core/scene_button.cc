@@ -17,6 +17,8 @@ SceneButton::SceneButton(double _x, double _y, double _size_x, double _size_y, s
   movie = new QMovie(QString::fromStdString(path));
   label->setMovie(movie);
 
+  AddState("default", _path);
+
   QString background_image = "image: url(" + QString::fromStdString(path) + ");";
   QString style_sheet = "background-color: rgba(255, 255, 255, 0);";
   label->setAttribute(Qt::WA_TranslucentBackground);
@@ -55,7 +57,7 @@ SceneButton::SceneButton(double _x, double _y, std::string _name, std::string _p
   this->size_y = p.height();
   label = new QLabel(parent);
   button = new QPushButton(parent);
-
+  AddState("default", _path);
   movie = new QMovie(QString::fromStdString(path));
   label->setMovie(movie);
 

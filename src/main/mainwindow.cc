@@ -52,6 +52,19 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 {
 }
 
+void MainWindow::Use(std::string item_name)
+{
+  for (int i = 0; i < bag.size(); i++)
+  {
+    if (bag[i] == item_name)
+    {
+      bag.erase(bag.begin() + i);
+      break;
+    }
+  }
+  ToolbarRefresh();
+}
+
 void MainWindow::Init()
 {
   std::string temp_name = "";
@@ -313,6 +326,40 @@ void MainWindow::Room2Init()
       this);
   scene1_nightstand->AddSceneButton(scene1_nightstand_bed);
 
+  SceneButton *scene1_nightstand_draw2 = new SceneButton(
+      326, 440, "nightstand_draw2", "./res/scene2_nightstand_draw2_close.png",
+      [&, this](SceneButton &obj)
+      {
+        if (obj.GetState() == "default")
+        {
+          obj.StateChange("open");
+        }
+        else if (obj.GetState() == "open")
+        {
+          obj.StateChange("default");
+        }
+      },
+      this);
+  scene1_nightstand_draw2->AddState("open", "./res/scene2_nightstand_draw2.png");
+  scene1_nightstand->AddSceneButton(scene1_nightstand_draw2);
+
+  SceneButton *scene1_nightstand_draw1 = new SceneButton(
+      326, 312, "nightstand_draw1", "./res/scene2_nightstand_draw1_close.png",
+      [&, this](SceneButton &obj)
+      {
+        if (obj.GetState() == "default")
+        {
+          obj.StateChange("open");
+        }
+        else if (obj.GetState() == "open")
+        {
+          obj.StateChange("default");
+        }
+      },
+      this);
+  scene1_nightstand_draw1->AddState("open", "./res/scene2_nightstand_draw1.png");
+  scene1_nightstand->AddSceneButton(scene1_nightstand_draw1);
+
   SceneButton *scene1_nightstand_key = new SceneButton(
       56, 364, "nightstand_key", "./res/scene2_nightstand_key.png",
       [&, this](SceneButton &obj)
@@ -417,6 +464,9 @@ void MainWindow::ToolbarRefresh()
     if (page * 14 + i < bag.size())
     {
       temp_name = bag[page * 14 + i];
+      if (temp_name == inhand)
+      {
+      }
       temp_path = "./res/items/" + temp_name + ".png";
       toolbar[i]->SetPath(temp_path);
       toolbar[i]->SetName(temp_name);

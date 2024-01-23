@@ -48,6 +48,7 @@ public:
   void handleDelayedKeyRelease();
   void mousePressEvent(QMouseEvent *event);
   void AddScene(std::string name, Scene *, bool default_scene = 0);
+  void Use(std::string item_name);
   void Init();
   void Room1Init();
   void Room2Init();

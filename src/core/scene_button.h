@@ -2,6 +2,7 @@
 #define SCENE_BUTTON_H
 
 #include <iostream>
+#include <map>
 #include <functional>
 
 #include <QWidget>
@@ -25,6 +26,8 @@ private:
   QLabel *label;
   QMovie *movie;
   bool valid = true;
+  std::map<std::string, std::string> states;
+  std::string nowstate = "default";
 
 public:
   explicit SceneButton(
@@ -45,7 +48,31 @@ public:
   bool IsMoved() { return !(x == label->x() && y == label->y()); }
   bool IsValid() { return valid; }
   void SetValid(bool s);
+  void AddState(std::string _name, std::string _path)
+  {
+    states[_name] = _path;
+  }
+  void StateChange(std::string state)
+  {
+    auto it = states.find(state);
 
+    // 检查是否找到键
+    if (it != states.end())
+    {
+      nowstate = state;
+      movie = new QMovie(QString::fromStdString(states[state]));
+      label->setMovie(movie);
+      movie->start();
+      QPixmap p(QString::fromStdString(states[state]));
+      QString background_image = "image: url(" + QString::fromStdString(states[state]) + ");";
+      QString style_sheet = "background-color: rgba(255, 255, 255, 0);";
+      label->setAttribute(Qt::WA_TranslucentBackground);
+      label->setFixedSize(p.width(), p.height());
+      button->setStyleSheet(style_sheet);
+      button->setFixedSize(p.width(), p.height());
+    }
+  }
+  std::string GetState() { return nowstate; }
 signals:
   void clicked(SceneButton &);
 };
