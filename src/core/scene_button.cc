@@ -97,13 +97,18 @@ void SceneButton::LocationReset()
   button->move(x, y);
 }
 
-void SceneButton::SetValid(bool s)
+void SceneButton::SetVisible(bool s)
 {
-  valid = s;
+  visible = s;
   if (!s)
   {
     button->hide();
     label->hide();
+  }
+  else if (s && valid)
+  {
+    button->show();
+    label->show();
   }
 }
 
@@ -125,4 +130,14 @@ void SceneButton::SetPath(std::string _path)
   button->setStyleSheet(style_sheet);
 
   movie->start();
+}
+
+void SceneButton::SetValid(bool s)
+{
+  valid = s;
+  if (!s)
+  {
+    button->hide();
+    label->hide();
+  }
 }

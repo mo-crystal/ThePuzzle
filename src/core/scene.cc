@@ -36,7 +36,7 @@ void Scene::SceneShow()
   sceneVisable = 1;
   for (int i = 0; i < scene_buttons.size(); i++)
   {
-    if (scene_buttons[i]->IsValid())
+    if (scene_buttons[i]->IsValid()&&scene_buttons[i]->IsVisible())
     {
       scene_buttons[i]->GetButton()->setVisible(1);
       scene_buttons[i]->GetLabel()->setVisible(1);

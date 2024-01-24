@@ -276,8 +276,17 @@ void MainWindow::Room2Init()
       [&, this](SceneButton &obj)
       {
         QMessageBox::information(this, "scene2", "paint");
+        if (obj.GetState() == "default" && inhand == "knife")
+        {
+          obj.StateChange("blood");
+        }
+        else if (obj.GetState() == "blood")
+        {
+          obj.StateChange("default");
+        }
       },
       this);
+  paint->AddState("blood", "./res/scene2_paint_state2.png");
   scene1->AddSceneButton(paint);
 
   SceneButton *left = new SceneButton(
@@ -326,6 +335,19 @@ void MainWindow::Room2Init()
       this);
   scene1_nightstand->AddSceneButton(scene1_nightstand_bed);
 
+  // TODO:如何让knife去订阅到draw1的状态变化从而改变可视性
+  SceneButton *scene1_nightstand_knife = new SceneButton(
+      376, 384, "nightstand_knife", "./res/scene2_nightstand_knife.png",
+      [&, this](SceneButton &obj)
+      {
+        bag.push_back("knife");
+        ToolbarRefresh();
+        obj.SetValid(false);
+      },
+      this);
+  scene1_nightstand_knife->SetVisible(false);
+  scene1_nightstand->AddSceneButton(scene1_nightstand_knife);
+  
   SceneButton *scene1_nightstand_draw2 = new SceneButton(
       326, 440, "nightstand_draw2", "./res/scene2_nightstand_draw2_close.png",
       [&, this](SceneButton &obj)
@@ -345,20 +367,25 @@ void MainWindow::Room2Init()
 
   SceneButton *scene1_nightstand_draw1 = new SceneButton(
       326, 312, "nightstand_draw1", "./res/scene2_nightstand_draw1_close.png",
-      [&, this](SceneButton &obj)
+      [scene1_nightstand_knife, this](SceneButton &obj)
       {
         if (obj.GetState() == "default")
         {
           obj.StateChange("open");
+          scene1_nightstand_knife->SetVisible(true);
         }
         else if (obj.GetState() == "open")
         {
+          scene1_nightstand_knife->SetVisible(false);
           obj.StateChange("default");
         }
       },
       this);
   scene1_nightstand_draw1->AddState("open", "./res/scene2_nightstand_draw1.png");
   scene1_nightstand->AddSceneButton(scene1_nightstand_draw1);
+
+  scene1_nightstand_knife->Raise();
+
 
   SceneButton *scene1_nightstand_key = new SceneButton(
       56, 364, "nightstand_key", "./res/scene2_nightstand_key.png",

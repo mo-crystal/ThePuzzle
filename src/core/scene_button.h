@@ -25,6 +25,7 @@ private:
   QPushButton *button;
   QLabel *label;
   QMovie *movie;
+  bool visible = true;
   bool valid = true;
   std::map<std::string, std::string> states;
   std::string nowstate = "default";
@@ -47,7 +48,8 @@ public:
   void LocationReset();
   bool IsMoved() { return !(x == label->x() && y == label->y()); }
   bool IsValid() { return valid; }
-  void SetValid(bool s);
+  bool IsVisible() { return visible; }
+  void SetVisible(bool s);
   void AddState(std::string _name, std::string _path)
   {
     states[_name] = _path;
@@ -73,6 +75,18 @@ public:
     }
   }
   std::string GetState() { return nowstate; }
+  void Raise()
+  {
+    label->raise();
+    button->raise();
+  }
+  void Lower()
+  {
+    label->lower();
+    button->lower();
+  }
+  void SetValid(bool s);
+
 signals:
   void clicked(SceneButton &);
 };
