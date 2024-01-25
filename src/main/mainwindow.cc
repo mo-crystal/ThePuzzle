@@ -7,7 +7,6 @@ MainWindow::MainWindow(QWidget *parent)
   ui->setupUi(this);
   ui->stackedWidget->setStyleSheet("background-color: transparent;");
   Init();
-
   FLASHTIMER = startTimer(100);
 }
 
@@ -67,6 +66,10 @@ void MainWindow::Use(std::string item_name)
   {
     if (bag[i] == item_name)
     {
+      if (inhand == item_name)
+      {
+        inhand = "";
+      }
       bag.erase(bag.begin() + i);
       break;
     }
@@ -284,14 +287,15 @@ void MainWindow::Room2Init()
       636, 100, "paint", "./res/scene2_paint_state1.png",
       [&, this](SceneButton &obj)
       {
-        QMessageBox::information(this, "scene2", "paint");
         if (obj.GetState() == "default" && inhand == "knife")
         {
           obj.StateChange("blood");
         }
-        else if (obj.GetState() == "blood")
+        else if (obj.GetState() == "blood" && inhand == "waterpot")
         {
-          obj.StateChange("default");
+          Use("waterpot");
+          bag.push_back("waterpot_filled_with_blood");
+          ToolbarRefresh();
         }
       },
       this);
@@ -325,11 +329,12 @@ void MainWindow::Room2Init()
 
   SceneButton *scene1_shelf_waterpot = new SceneButton(
       448, 162, "waterpot", "./res/scene2_shelf_waterpot.png",
-      [&, this](SceneButton &obj)
+      [waterpot, this](SceneButton &obj)
       {
         bag.push_back("waterpot");
         ToolbarRefresh();
         obj.SetValid(false);
+        waterpot->SetValid(false);
       },
       this);
   scene1_shelf->AddSceneButton(scene1_shelf_waterpot);
