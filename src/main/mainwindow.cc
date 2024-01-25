@@ -461,10 +461,65 @@ void MainWindow::Room2Init()
 }
 
 void MainWindow::Room3Init()
-{
-
+{  
   Scene *scene2 = new Scene("./res/bgp_blank.png", "");
   AddScene("scene2", scene2);
+
+  SceneButton *bookshelf = new SceneButton(
+      32, 184, "bookshelf", "./res/scene3_bookshelf.png",
+      [&, this](SceneButton &obj)
+      {
+        Scenes[nowScene]->SceneDisappear();
+        nowScene = "scene2_bookshelf";
+        Scenes[nowScene]->SceneShow();
+      },
+      this);
+  scene2->AddSceneButton(bookshelf);
+
+  SceneButton *mirror = new SceneButton(
+      640, 192, "mirror", "./res/scene3_mirror.png",
+      [&, this](SceneButton &obj)
+      {
+        Scenes[nowScene]->SceneDisappear();
+        nowScene = "scene2_mirror";
+        Scenes[nowScene]->SceneShow();
+      },
+      this);
+  scene2->AddSceneButton(mirror);
+
+
+
+
+
+
+  Scene *scene3_mirror_mirror = new Scene("./res/scene3_mirror_mirror.png", "");
+  AddScene("scene2_mirror", scene3_mirror_mirror);
+
+  SceneButton *scene3_mirror_mirror_return_button = new SceneButton(
+      448, 580, "down_arrow", "./res/down_arrow.png",
+      [&, this](SceneButton &obj)
+      {
+        Scenes[nowScene]->SceneDisappear();
+        nowScene = "scene2";
+        Scenes[nowScene]->SceneShow();
+      },
+      this);
+  scene3_mirror_mirror->AddSceneButton(scene3_mirror_mirror_return_button);
+
+  Scene *scene3_bookshelf_bookshelf = new Scene("./res/scene3_bookshelf_bookshelf.png", "");
+  AddScene("scene2_bookshelf", scene3_bookshelf_bookshelf);
+
+  SceneButton *scene3_bookshelf_bookshelf_return_button = new SceneButton(
+      448, 580, "down_arrow", "./res/down_arrow.png",
+      [&, this](SceneButton &obj)
+      {
+        Scenes[nowScene]->SceneDisappear();
+        nowScene = "scene2";
+        Scenes[nowScene]->SceneShow();
+      },
+      this);
+  scene3_bookshelf_bookshelf->AddSceneButton(scene3_bookshelf_bookshelf_return_button);
+
   SceneButton *left = new SceneButton(
       10, 340, "left_arrow", "./res/left_arrow.png",
       [&, this](SceneButton &obj)
