@@ -39,8 +39,17 @@ void MainWindow::paintEvent(QPaintEvent *event)
   painter.drawPixmap(0, 0, DEFUALT_WIDTH, DEFUALT_HEIGHT, *p);
   QPixmap *p_tool = new QPixmap("./res/toolbar.png");
   painter.drawPixmap(0, DEFUALT_HEIGHT, DEFUALT_WIDTH, DEFUALT_HEIGHT_TOOLBAR, *p_tool);
+  QPixmap *frame = new QPixmap(QString::fromStdString("./res/items/selectframe.png"));
+  for (int i = 0; i < TOOLBAR_SIZE; i++)
+  {
+    if (toolbar[i]->GetName() == inhand && inhand != "")
+    {
+      painter.drawPixmap(36 + i * (8 + 56), 644, 56, 56, *frame);
+    }
+  }
 
   delete p;
+  delete frame;
   delete p_tool;
 }
 
@@ -314,6 +323,26 @@ void MainWindow::Room2Init()
   Scene *scene1_shelf = new Scene("./res/bgp_scene2_shelf.png", "");
   AddScene("scene1_shelf", scene1_shelf);
 
+  SceneButton *scene1_shelf_waterpot = new SceneButton(
+      448, 162, "waterpot", "./res/scene2_shelf_waterpot.png",
+      [&, this](SceneButton &obj)
+      {
+        bag.push_back("waterpot");
+        ToolbarRefresh();
+        obj.SetValid(false);
+      },
+      this);
+  scene1_shelf->AddSceneButton(scene1_shelf_waterpot);
+
+  SceneButton *scene1_shelf_plant = new SceneButton(
+      196, 212, "plant", "./res/scene2_shelf_plant.png",
+      [&, this](SceneButton &obj)
+      {
+        QMessageBox::information(this, "", "plant");
+      },
+      this);
+  scene1_shelf->AddSceneButton(scene1_shelf_plant);
+
   SceneButton *scene1_shelf_return_button = new SceneButton(
       448, 580, "down_arrow", "./res/down_arrow.png",
       [&, this](SceneButton &obj)
@@ -347,7 +376,7 @@ void MainWindow::Room2Init()
       this);
   scene1_nightstand_knife->SetVisible(false);
   scene1_nightstand->AddSceneButton(scene1_nightstand_knife);
-  
+
   SceneButton *scene1_nightstand_draw2 = new SceneButton(
       326, 440, "nightstand_draw2", "./res/scene2_nightstand_draw2_close.png",
       [&, this](SceneButton &obj)
@@ -385,7 +414,6 @@ void MainWindow::Room2Init()
   scene1_nightstand->AddSceneButton(scene1_nightstand_draw1);
 
   scene1_nightstand_knife->Raise();
-
 
   SceneButton *scene1_nightstand_key = new SceneButton(
       56, 364, "nightstand_key", "./res/scene2_nightstand_key.png",
