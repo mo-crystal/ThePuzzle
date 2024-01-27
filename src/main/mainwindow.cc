@@ -87,12 +87,13 @@ void MainWindow::Init()
     {
       temp_name = bag[page * 14 + i];
       temp_path = "./res/items/" + temp_name + ".png";
-      QMessageBox::information(this, "", QString::fromStdString(temp_path));
+      //QMessageBox::information(this, "", QString::fromStdString(temp_path));
     }
     SceneButton *temp = new SceneButton(
         36 + i * (8 + 56), 644, 56, 56, temp_name, temp_path, [temp_name, this](SceneButton &obj)
         {inhand=obj.GetName();
-        QMessageBox::information(this,"",QString::fromStdString(inhand)); },
+        //QMessageBox::information(this,"",QString::fromStdString(inhand)); 
+        },
         this);
     toolbar.push_back(temp);
   }
@@ -141,7 +142,7 @@ void MainWindow::Room1Init()
       123, 320, "computer", "./res/scene1_computer.png",
       [&, this](SceneButton &obj)
       {
-        QMessageBox::information(this, "", "computer");
+        //QMessageBox::information(this, "", "computer");
       },
       this);
   scene->AddSceneButton(s1_computer);
@@ -172,7 +173,7 @@ void MainWindow::Room1Init()
       39, 310, "plant", "./res/scene1_plant.png",
       [&, this](SceneButton &obj)
       {
-        QMessageBox::information(this, "", "plant");
+        //QMessageBox::information(this, "", "plant");
       },
       this);
   scene->AddSceneButton(s1_plant);
@@ -181,7 +182,7 @@ void MainWindow::Room1Init()
       239, 124, "window", "./res/scene1_window.png",
       [&, this](SceneButton &obj)
       {
-        QMessageBox::information(this, "", "window");
+        //QMessageBox::information(this, "", "window");
       },
       this);
   scene->AddSceneButton(s1_window);
@@ -343,7 +344,7 @@ void MainWindow::Room2Init()
       196, 212, "plant", "./res/scene2_shelf_plant.png",
       [&, this](SceneButton &obj)
       {
-        QMessageBox::information(this, "", "plant");
+        //QMessageBox::information(this, "", "plant");
       },
       this);
   scene1_shelf->AddSceneButton(scene1_shelf_plant);
@@ -461,7 +462,7 @@ void MainWindow::Room2Init()
 }
 
 void MainWindow::Room3Init()
-{  
+{
   Scene *scene2 = new Scene("./res/bgp_blank.png", "");
   AddScene("scene2", scene2);
 
@@ -485,15 +486,58 @@ void MainWindow::Room3Init()
         Scenes[nowScene]->SceneShow();
       },
       this);
+  mirror->AddState("broken", "./res/scene3_mirror_broken.png");
   scene2->AddSceneButton(mirror);
-
-
-
-
-
 
   Scene *scene3_mirror_mirror = new Scene("./res/scene3_mirror_mirror.png", "");
   AddScene("scene2_mirror", scene3_mirror_mirror);
+
+  SceneButton *scene3_mirror_mirror_hand = new SceneButton(
+      620, 472, "hand", "./res/scene3_mirror_mirror_hand.png",
+      [&, this](SceneButton &obj) {
+      },
+      this);
+  scene3_mirror_mirror->AddSceneButton(scene3_mirror_mirror_hand);
+
+  scene3_mirror_mirror_hand->SetVisible(false);
+
+  SceneButton *scene3_mirror_mirror_mirror = new SceneButton(
+      256, 38, "down_arrow", "./res/scene3_mirror_mirror_well.png",
+      [&, mirror, scene3_mirror_mirror_hand, this](SceneButton &obj)
+      {
+        if (obj.GetState() == "default")
+        {
+          scene3_mirror_mirror_hand->SetVisible(true);
+          obj.StateChange("well_hand");
+        }
+        else if (obj.GetState() == "well_hand" && inhand == "knife")
+        {
+          bag.push_back("finger");
+          ToolbarRefresh();
+          mirror->StateChange("broken");
+          obj.StateChange("broken_hand");
+        }
+        else if (obj.GetState() == "well_hand")
+        {
+          scene3_mirror_mirror_hand->SetVisible(false);
+          obj.StateChange("default");
+        }
+        else if (obj.GetState() == "broken_hand")
+        {
+          scene3_mirror_mirror_hand->SetVisible(false);
+          obj.StateChange("broken");
+        }
+        else
+        {
+        }
+      },
+      this);
+  scene3_mirror_mirror_mirror->AddState("well_hand", "./res/scene3_mirror_mirror_well_with_hand.png");
+  scene3_mirror_mirror_mirror->AddState("broken_hand", "./res/scene3_mirror_mirror_broken_with_hand.png");
+  scene3_mirror_mirror_mirror->AddState("broken", "./res/scene3_mirror_mirror_broken.png");
+  scene3_mirror_mirror->AddSceneButton(scene3_mirror_mirror_mirror);
+
+  scene3_mirror_mirror_hand->Raise();
 
   SceneButton *scene3_mirror_mirror_return_button = new SceneButton(
       448, 580, "down_arrow", "./res/down_arrow.png",
@@ -547,6 +591,35 @@ void MainWindow::Room4Init()
 {
   Scene *scene3 = new Scene("./res/bgp_blank.png", "");
   AddScene("scene3", scene3);
+
+  Scene *scene4_door_door = new Scene("./res/scene4_door_door.png", "");
+  AddScene("scene4_door", scene4_door_door);
+
+  Scene *scene4_puzzle_puzzle = new Scene("./res/scene4_puzzle_puzzle.png", "");
+  AddScene("scene4_puzzle", scene4_puzzle_puzzle);
+
+  SceneButton *door = new SceneButton(
+      332, 200, "bookshelf", "./res/scene4_door.png",
+      [&, this](SceneButton &obj)
+      {
+        Scenes[nowScene]->SceneDisappear();
+        nowScene = "scene4_door";
+        Scenes[nowScene]->SceneShow();
+      },
+      this);
+  scene3->AddSceneButton(door);
+
+  SceneButton *puzzle = new SceneButton(
+      100, 240, "puzzle", "./res/scene4_puzzle.png",
+      [&, this](SceneButton &obj)
+      {
+        Scenes[nowScene]->SceneDisappear();
+        nowScene = "scene4_puzzle·";
+        Scenes[nowScene]->SceneShow();
+      },
+      this);
+  scene3->AddSceneButton(puzzle);
+
   SceneButton *left = new SceneButton(
       10, 340, "left_arrow", "./res/left_arrow.png",
       [&, this](SceneButton &obj)
