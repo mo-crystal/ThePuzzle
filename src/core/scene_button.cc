@@ -1,6 +1,6 @@
 #include "scene_button.h"
 
-SceneButton::SceneButton(double _x, double _y, double _size_x, double _size_y, std::string _name, std::string _path, std::function<void(SceneButton &)> _onClick, QWidget *parent)
+SceneButton::SceneButton(double _x, double _y, double _size_x, double _size_y, std::string _name, std::string _path, std::function<void(SceneButton &)> _onClick, QWidget *parent, std::string descrip)
     : QWidget(parent)
 {
   this->x = _x;
@@ -10,6 +10,8 @@ SceneButton::SceneButton(double _x, double _y, double _size_x, double _size_y, s
   this->name = _name;
   this->path = _path;
   this->onClick = _onClick;
+  this->description = descrip;
+
   QPixmap p(QString::fromStdString(path));
   label = new QLabel(parent);
   button = new QPushButton(parent);
@@ -42,7 +44,7 @@ SceneButton::SceneButton(double _x, double _y, double _size_x, double _size_y, s
   movie->start();
 }
 
-SceneButton::SceneButton(double _x, double _y, std::string _name, std::string _path, std::function<void(SceneButton &)> _onClick, QWidget *parent)
+SceneButton::SceneButton(double _x, double _y, std::string _name, std::string _path, std::function<void(SceneButton &)> _onClick, QWidget *parent, std::string descrip)
     : QWidget(parent)
 {
   this->x = _x;
@@ -50,6 +52,7 @@ SceneButton::SceneButton(double _x, double _y, std::string _name, std::string _p
   this->path = _path;
   this->onClick = _onClick;
   this->name = _name;
+  this->description = descrip;
 
   QPixmap p(QString::fromStdString(path));
 

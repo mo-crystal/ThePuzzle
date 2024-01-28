@@ -26,6 +26,8 @@
 #define DEFUALT_HEIGHT_TOOLBAR 60
 #define START_PAGE_BUTTON_WIDTH DEFUALT_WIDTH / 6
 #define TOOLBAR_SIZE 14
+#define DESCRIPTIONTIME 4000
+
 
 namespace Ui
 {
@@ -55,7 +57,7 @@ public:
   void Room3Init();
   void Room4Init();
   void ToolbarRefresh();
-
+  void ShowDescription(std::string descrip);
 private:
   Ui::MainWindow *ui;
   std::map<std::string, Scene *> Scenes;
@@ -65,6 +67,8 @@ private:
   std::string inhand = "";
   bool isplaying = false;
   int FLASHTIMER;
+  QTimer *description_label_timer = NULL;
+
 private slots:
 };
 

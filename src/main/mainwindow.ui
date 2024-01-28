@@ -55,14 +55,36 @@
     <widget class="QLabel" name="label">
      <property name="geometry">
       <rect>
-       <x>150</x>
-       <y>240</y>
-       <width>431</width>
-       <height>16</height>
+       <x>0</x>
+       <y>0</y>
+       <width>960</width>
+       <height>30</height>
       </rect>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>960</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>960</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 255, 255);
+font: 500 20pt &quot;m5x7&quot;;
+border-width: 2px;
+border-color: black;
+border-style: solid;</string>
+     </property>
      <property name="text">
-      <string/>
+      <string>TextLabel</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </widget>

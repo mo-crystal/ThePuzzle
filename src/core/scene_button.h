@@ -29,12 +29,13 @@ private:
   bool valid = true;
   std::map<std::string, std::string> states;
   std::string nowstate = "default";
+  std::string description = "Nothing.";
 
 public:
   explicit SceneButton(
-      double _x, double _y, double _size_x, double _size_y, std::string _name, std::string _path, std::function<void(SceneButton &)> _onClick, QWidget *parent);
+      double _x, double _y, double _size_x, double _size_y, std::string _name, std::string _path, std::function<void(SceneButton &)> _onClick, QWidget *parent, std::string descrip = "Nothing.");
   explicit SceneButton(
-      double _x, double _y, std::string _name, std::string _path, std::function<void(SceneButton &)> _onClick, QWidget *parent);
+      double _x, double _y, std::string _name, std::string _path, std::function<void(SceneButton &)> _onClick, QWidget *parent, std::string descrip = "Nothing.");
   ~SceneButton();
   std::string GetName() { return this->name; }
   std::string GetPath() { return this->path; }
@@ -86,7 +87,7 @@ public:
     button->lower();
   }
   void SetValid(bool s);
-
+  std::string GetDescription() { return description; }
 signals:
   void clicked(SceneButton &);
 };

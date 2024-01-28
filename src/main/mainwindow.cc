@@ -6,8 +6,13 @@ MainWindow::MainWindow(QWidget *parent)
 {
   ui->setupUi(this);
   ui->stackedWidget->setStyleSheet("background-color: transparent;");
+  ui->label->setVisible(false);
   Init();
   FLASHTIMER = startTimer(100);
+  description_label_timer = new QTimer(this);
+  description_label_timer->setInterval(DESCRIPTIONTIME);
+  connect(description_label_timer, &QTimer::timeout, this, [=]()
+          { ui->label->hide(); });
 }
 
 MainWindow::~MainWindow()
@@ -87,12 +92,13 @@ void MainWindow::Init()
     {
       temp_name = bag[page * 14 + i];
       temp_path = "./res/items/" + temp_name + ".png";
-      //QMessageBox::information(this, "", QString::fromStdString(temp_path));
+      // QMessageBox::information(this, "", QString::fromStdString(temp_path));
     }
     SceneButton *temp = new SceneButton(
         36 + i * (8 + 56), 644, 56, 56, temp_name, temp_path, [temp_name, this](SceneButton &obj)
-        {inhand=obj.GetName();
-        //QMessageBox::information(this,"",QString::fromStdString(inhand)); 
+        {
+          inhand = obj.GetName();
+          // QMessageBox::information(this,"",QString::fromStdString(inhand));
         },
         this);
     toolbar.push_back(temp);
@@ -142,9 +148,9 @@ void MainWindow::Room1Init()
       123, 320, "computer", "./res/scene1_computer.png",
       [&, this](SceneButton &obj)
       {
-        //QMessageBox::information(this, "", "computer");
+        ShowDescription(obj.GetDescription());
       },
-      this);
+      this,"Some unimportant news.");
   scene->AddSceneButton(s1_computer);
 
   SceneButton *s1_bed = new SceneButton(
@@ -173,7 +179,7 @@ void MainWindow::Room1Init()
       39, 310, "plant", "./res/scene1_plant.png",
       [&, this](SceneButton &obj)
       {
-        //QMessageBox::information(this, "", "plant");
+        // QMessageBox::information(this, "", "plant");
       },
       this);
   scene->AddSceneButton(s1_plant);
@@ -182,7 +188,7 @@ void MainWindow::Room1Init()
       239, 124, "window", "./res/scene1_window.png",
       [&, this](SceneButton &obj)
       {
-        //QMessageBox::information(this, "", "window");
+        // QMessageBox::information(this, "", "window");
       },
       this);
   scene->AddSceneButton(s1_window);
@@ -344,7 +350,7 @@ void MainWindow::Room2Init()
       196, 212, "plant", "./res/scene2_shelf_plant.png",
       [&, this](SceneButton &obj)
       {
-        //QMessageBox::information(this, "", "plant");
+        // QMessageBox::information(this, "", "plant");
       },
       this);
   scene1_shelf->AddSceneButton(scene1_shelf_plant);
@@ -660,4 +666,11 @@ void MainWindow::ToolbarRefresh()
       toolbar[i]->SetName(temp_name);
     }
   }
+}
+
+void MainWindow::ShowDescription(std::string descrip)
+{
+  ui->label->setText(QString::fromStdString(descrip));
+  ui->label->show();
+  description_label_timer->start();
 }
