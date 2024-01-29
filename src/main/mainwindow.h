@@ -58,12 +58,12 @@ public:
   void Room4Init();
   void ToolbarRefresh();
   void ShowDescription(std::string descrip);
-
+  void AddItem(std::string name,Item item);
 private:
   Ui::MainWindow *ui;
   std::map<std::string, Scene *> Scenes;
   std::vector<SceneButton *> toolbar;
-  std::vector<std::string> bag;
+  std::map<std::string,Item> bag;
   int page = 0;
   std::string inhand = "";
   bool isplaying = false;

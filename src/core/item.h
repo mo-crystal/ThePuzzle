@@ -5,6 +5,10 @@
 #include <map>
 #include <iostream>
 
+#define NOTENOUGH -1
+#define EMPTY 0
+#define DONE 1
+
 #define DEFAULT_MAX_STACK 64
 
 class Construct;
@@ -24,5 +28,6 @@ public:
   int GetDurability() { return this->durability; }
   std::string GetDescription() { return this->description; }
   int Use();
+  void Add();
 };
 #endif

@@ -87,6 +87,7 @@ public:
     button->lower();
   }
   void SetValid(bool s);
+  void SetDescription(std::string descrip) { this->description = descrip; }
   std::string GetDescription() { return description; }
 signals:
   void clicked(SceneButton &);

@@ -1,8 +1,6 @@
 #include "item.h"
 
-Item::Item()
-{
-}
+Item::Item() {}
 
 Item::Item(int _need, int _durability, std::string _description)
 {
@@ -22,12 +20,17 @@ int Item::Use()
     this->durability -= 1;
     if (durability <= 0)
     {
-      return 1;
+      return EMPTY;
     }
-    return 0;
+    return DONE;
   }
   else
   {
-    return -1;
+    return NOTENOUGH;
   }
+}
+
+void Item::Add()
+{
+  this->now++;
 }

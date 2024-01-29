@@ -67,19 +67,22 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
 void MainWindow::Use(std::string item_name)
 {
-  for (int i = 0; i < bag.size(); i++)
+  if (bag.find(item_name) != bag.end())
   {
-    if (bag[i] == item_name)
+    int res = bag[item_name].Use();
+    if (res == EMPTY)
     {
-      if (inhand == item_name)
-      {
-        inhand = "";
-      }
-      bag.erase(bag.begin() + i);
-      break;
+      bag.erase(item_name);
     }
+    else if (res == NOTENOUGH)
+    {
+      ShowDescription("I haven't found enough of this yet.");
+    }
+    else
+    {
+    }
+    ToolbarRefresh();
   }
-  ToolbarRefresh();
 }
 
 void MainWindow::Init()
@@ -90,17 +93,19 @@ void MainWindow::Init()
   {
     if (page * 14 + i < bag.size())
     {
-      temp_name = bag[page * 14 + i];
+      auto it = bag.begin();
+      advance(it, page * 14 + i);
+      temp_name = (*it).first;
       temp_path = "./res/items/" + temp_name + ".png";
       // QMessageBox::information(this, "", QString::fromStdString(temp_path));
     }
     SceneButton *temp = new SceneButton(
         36 + i * (8 + 56), 644, 56, 56, temp_name, temp_path, [temp_name, this](SceneButton &obj)
         {
-          inhand = obj.GetName();
-          // QMessageBox::information(this,"",QString::fromStdString(inhand));
-        },
-        this);
+          if(inhand == obj.GetName()){
+            ShowDescription(obj.GetDescription()); 
+          } inhand = obj.GetName(); },
+        this, "");
     toolbar.push_back(temp);
   }
   ToolbarRefresh();
@@ -296,13 +301,14 @@ void MainWindow::Room2Init()
       {
         if (obj.GetState() == "default" && inhand == "knife")
         {
+          Use("knife");
           obj.StateChange("blood");
         }
         else if (obj.GetState() == "blood" && inhand == "waterpot")
         {
           Use("waterpot");
-          bag.push_back("waterpot_filled_with_blood");
-          ToolbarRefresh();
+          Item waterpot_filled_with_blood(1, 1, "Filled with blood.");
+          AddItem("waterpot_filled_with_blood", waterpot_filled_with_blood);
         }
         else if (obj.GetState() == "default")
         {
@@ -310,10 +316,11 @@ void MainWindow::Room2Init()
         }
         else if (obj.GetState() == "blood")
         {
+          Use("knife");
           ShowDescription("Strange and pathetic now.");
         }
       },
-      this,"A strange paint.Seems to be alive.");
+      this, "A strange paint.Seems to be alive.");
   paint->AddState("blood", "./res/scene2_paint_state2.png");
   scene1->AddSceneButton(paint);
 
@@ -346,8 +353,8 @@ void MainWindow::Room2Init()
       448, 162, "waterpot", "./res/scene2_shelf_waterpot.png",
       [waterpot, this](SceneButton &obj)
       {
-        bag.push_back("waterpot");
-        ToolbarRefresh();
+        Item item_waterpot(1, 1, "It's empty.");
+        AddItem("waterpot", item_waterpot);
         obj.SetValid(false);
         waterpot->SetValid(false);
       },
@@ -384,13 +391,12 @@ void MainWindow::Room2Init()
       this);
   scene1_nightstand->AddSceneButton(scene1_nightstand_bed);
 
-  // TODO:如何让knife去订阅到draw1的状态变化从而改变可视性
   SceneButton *scene1_nightstand_knife = new SceneButton(
       376, 384, "nightstand_knife", "./res/scene2_nightstand_knife.png",
       [&, this](SceneButton &obj)
       {
-        bag.push_back("knife");
-        ToolbarRefresh();
+        Item item_knife(1, 2, "It's so sharp it looks like it can cut into another world.");
+        AddItem("knife", item_knife);
         obj.SetValid(false);
       },
       this);
@@ -439,8 +445,8 @@ void MainWindow::Room2Init()
       56, 364, "nightstand_key", "./res/scene2_nightstand_key.png",
       [&, this](SceneButton &obj)
       {
-        bag.push_back("key");
-        ToolbarRefresh();
+        Item item_key(1, 1, "Now I need a keyhole.");
+        AddItem("key", item_key);
         obj.SetValid(false);
       },
       this);
@@ -528,8 +534,9 @@ void MainWindow::Room3Init()
         }
         else if (obj.GetState() == "well_hand" && inhand == "knife")
         {
-          bag.push_back("finger");
-          ToolbarRefresh();
+          Use("knife");
+          Item item_finger(1, 1, "I'm so glad it's not mine.");
+          AddItem("finger", item_finger);
           mirror->StateChange("broken");
           obj.StateChange("broken_hand");
         }
@@ -662,26 +669,49 @@ void MainWindow::Room4Init()
 
 void MainWindow::ToolbarRefresh()
 {
-  std::string temp_name = "";
-  std::string temp_path = "";
   for (int i = 0; i < TOOLBAR_SIZE; i++)
   {
+    std::string temp_name = "";
+    std::string temp_path = "";
+    std::string temp_description = "";
     if (page * 14 + i < bag.size())
     {
-      temp_name = bag[page * 14 + i];
+      auto it = bag.begin();
+      advance(it, page * 14 + i);
+
+      temp_name = (*it).first;
+      temp_description = (*it).second.GetDescription();
       if (temp_name == inhand)
       {
       }
       temp_path = "./res/items/" + temp_name + ".png";
-      toolbar[i]->SetPath(temp_path);
-      toolbar[i]->SetName(temp_name);
     }
+    toolbar[i]->SetPath(temp_path);
+    toolbar[i]->SetName(temp_name);
+    toolbar[i]->SetDescription(temp_description);
   }
+  repaint();
 }
 
 void MainWindow::ShowDescription(std::string descrip)
 {
-  ui->label->setText(QString::fromStdString(descrip));
-  ui->label->show();
-  description_label_timer->start();
+  if (descrip != "")
+  {
+    ui->label->setText(QString::fromStdString(descrip));
+    ui->label->show();
+    description_label_timer->start();
+  }
+}
+
+void MainWindow::AddItem(std::string name, Item item)
+{
+  if (bag.find(name) != bag.end())
+  {
+    bag[name].Add();
+  }
+  else
+  {
+    bag[name] = item;
+  }
+  ToolbarRefresh();
 }
