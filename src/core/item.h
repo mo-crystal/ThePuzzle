@@ -12,18 +12,17 @@ class Construct;
 class Item
 {
 private:
-  int ID = -1;
-  std::string name = "";
-  std::string path = "";
+  int durability = 1;
+  int need = 1;
+  int now = 1;
+  std::string description = "";
 
 public:
   Item();
-  Item(int _ID, std::string _name, int _maxStack, std::string _path, std::map<int, int> tmp_recipe, double _durability = -1.0, double buildingtime = 0);
+  Item(int _need, int _durability, std::string _description);
   ~Item();
-  int GetID() { return this->ID; }
-  std::string GetName() { return this->name; }
-  bool operator==(const Item &other) { return (this->ID == other.ID && this->name == other.name); }
-  bool IsValid() { return ID >= 0; }
-  std::string GetPath() { return this->path; }
+  int GetDurability() { return this->durability; }
+  std::string GetDescription() { return this->description; }
+  int Use();
 };
 #endif

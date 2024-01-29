@@ -150,7 +150,7 @@ void MainWindow::Room1Init()
       {
         ShowDescription(obj.GetDescription());
       },
-      this,"Some unimportant news.");
+      this, "Some unimportant news.");
   scene->AddSceneButton(s1_computer);
 
   SceneButton *s1_bed = new SceneButton(
@@ -179,18 +179,18 @@ void MainWindow::Room1Init()
       39, 310, "plant", "./res/scene1_plant.png",
       [&, this](SceneButton &obj)
       {
-        // QMessageBox::information(this, "", "plant");
+        ShowDescription(obj.GetDescription());
       },
-      this);
+      this, "It's growing pretty well.");
   scene->AddSceneButton(s1_plant);
 
   SceneButton *s1_window = new SceneButton(
       239, 124, "window", "./res/scene1_window.png",
       [&, this](SceneButton &obj)
       {
-        // QMessageBox::information(this, "", "window");
+        ShowDescription(obj.GetDescription());
       },
-      this);
+      this, "Am I on an island?");
   scene->AddSceneButton(s1_window);
 
   SceneButton *left = new SceneButton(
@@ -304,8 +304,16 @@ void MainWindow::Room2Init()
           bag.push_back("waterpot_filled_with_blood");
           ToolbarRefresh();
         }
+        else if (obj.GetState() == "default")
+        {
+          ShowDescription(obj.GetDescription());
+        }
+        else if (obj.GetState() == "blood")
+        {
+          ShowDescription("Strange and pathetic now.");
+        }
       },
-      this);
+      this,"A strange paint.Seems to be alive.");
   paint->AddState("blood", "./res/scene2_paint_state2.png");
   scene1->AddSceneButton(paint);
 
@@ -500,9 +508,11 @@ void MainWindow::Room3Init()
 
   SceneButton *scene3_mirror_mirror_hand = new SceneButton(
       620, 472, "hand", "./res/scene3_mirror_mirror_hand.png",
-      [&, this](SceneButton &obj) {
+      [&, this](SceneButton &obj)
+      {
+        ShowDescription(obj.GetDescription());
       },
-      this);
+      this, "I don't want to hurt myself.");
   scene3_mirror_mirror->AddSceneButton(scene3_mirror_mirror_hand);
 
   scene3_mirror_mirror_hand->SetVisible(false);
@@ -533,11 +543,12 @@ void MainWindow::Room3Init()
           scene3_mirror_mirror_hand->SetVisible(false);
           obj.StateChange("broken");
         }
-        else
+        else if (obj.GetState() == "broken")
         {
+          ShowDescription(obj.GetDescription());
         }
       },
-      this);
+      this, "It's broken now.");
   scene3_mirror_mirror_mirror->AddState("well_hand", "./res/scene3_mirror_mirror_well_with_hand.png");
   scene3_mirror_mirror_mirror->AddState("broken_hand", "./res/scene3_mirror_mirror_broken_with_hand.png");
   scene3_mirror_mirror_mirror->AddState("broken", "./res/scene3_mirror_mirror_broken.png");

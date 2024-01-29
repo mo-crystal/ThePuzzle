@@ -20,6 +20,7 @@
 #include <QTimer>
 
 #include "../core/scene.h"
+#include "../core/item.h"
 
 #define DEFUALT_WIDTH 960
 #define DEFUALT_HEIGHT 640
@@ -27,7 +28,6 @@
 #define START_PAGE_BUTTON_WIDTH DEFUALT_WIDTH / 6
 #define TOOLBAR_SIZE 14
 #define DESCRIPTIONTIME 4000
-
 
 namespace Ui
 {
@@ -58,6 +58,7 @@ public:
   void Room4Init();
   void ToolbarRefresh();
   void ShowDescription(std::string descrip);
+
 private:
   Ui::MainWindow *ui;
   std::map<std::string, Scene *> Scenes;
