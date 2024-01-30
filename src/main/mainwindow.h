@@ -19,6 +19,7 @@
 #include <QMouseEvent>
 #include <QTimer>
 
+
 #include "../core/scene.h"
 #include "../core/item.h"
 
@@ -58,12 +59,17 @@ public:
   void Room4Init();
   void ToolbarRefresh();
   void ShowDescription(std::string descrip);
-  void AddItem(std::string name,Item item);
+  void AddItem(std::string name, Item item);
+  bool CheckState(std::string scene_name, std::string button_name, std::string state);
+  void SetState(std::string scene_name, std::string button_name, std::string state);
+  void SetVisible(std::string scene_name,std::string name, bool state);
+  void SetValid(std::string scene_name,std::string name, bool state);
+
 private:
   Ui::MainWindow *ui;
   std::map<std::string, Scene *> Scenes;
   std::vector<SceneButton *> toolbar;
-  std::map<std::string,Item> bag;
+  std::map<std::string, Item> bag;
   int page = 0;
   std::string inhand = "";
   bool isplaying = false;

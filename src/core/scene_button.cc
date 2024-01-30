@@ -144,3 +144,14 @@ void SceneButton::SetValid(bool s)
     label->hide();
   }
 }
+
+void SceneButton::NextState()
+{
+  auto it = states.find(nowstate);
+  it++;
+  if (it == states.end())
+  {
+    it = states.begin();
+  }
+  StateChange((*it).first);
+}

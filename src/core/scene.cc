@@ -43,3 +43,48 @@ void Scene::SceneShow()
     }
   }
 }
+
+bool Scene::CheckState(std::string name, std::string state)
+{
+  for (int i = 0; i < scene_buttons.size(); i++)
+  {
+    if (scene_buttons[i]->GetName() == name)
+    {
+      return scene_buttons[i]->GetState() == state;
+    }
+  }
+  return false;
+}
+
+void Scene::SetState(std::string name, std::string state)
+{
+  for (int i = 0; i < scene_buttons.size(); i++)
+  {
+    if (scene_buttons[i]->GetName() == name)
+    {
+      scene_buttons[i]->StateChange(state);
+    }
+  }
+}
+
+void Scene::SetVisible(std::string name, bool state)
+{
+  for (int i = 0; i < scene_buttons.size(); i++)
+  {
+    if (scene_buttons[i]->GetName() == name)
+    {
+      scene_buttons[i]->SetVisible(state);
+    }
+  }
+}
+
+void Scene::SetValid(std::string name, bool state)
+{
+  for (int i = 0; i < scene_buttons.size(); i++)
+  {
+    if (scene_buttons[i]->GetName() == name)
+    {
+      scene_buttons[i]->SetValid(state);
+    }
+  }
+}

@@ -89,6 +89,7 @@ public:
   void SetValid(bool s);
   void SetDescription(std::string descrip) { this->description = descrip; }
   std::string GetDescription() { return description; }
+  void NextState();
 signals:
   void clicked(SceneButton &);
 };

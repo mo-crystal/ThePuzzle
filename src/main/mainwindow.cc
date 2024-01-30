@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -223,6 +222,17 @@ void MainWindow::Room1Init()
   Scene *scene_desk = new Scene("./res/bgp_scene1_desk.png", "");
   AddScene("scene_desk", scene_desk);
 
+  SceneButton *puzzle_piece = new SceneButton(
+      652, 420, "puzzle_piece", "./res/puzzle_piece.png",
+      [&, this](SceneButton &obj)
+      {
+        Item puzzle_piece(9, 1, "Piece.");
+        AddItem("puzzle_piece", puzzle_piece);
+        obj.SetValid(false);
+      },
+      this);
+  scene_desk->AddSceneButton(puzzle_piece);
+
   SceneButton *scene_desk_return_button = new SceneButton(
       448, 580, "down_arrow", "./res/down_arrow.png",
       [&, this](SceneButton &obj)
@@ -316,7 +326,6 @@ void MainWindow::Room2Init()
         }
         else if (obj.GetState() == "blood")
         {
-          Use("knife");
           ShowDescription("Strange and pathetic now.");
         }
       },
@@ -349,6 +358,17 @@ void MainWindow::Room2Init()
   Scene *scene1_shelf = new Scene("./res/bgp_scene2_shelf.png", "");
   AddScene("scene1_shelf", scene1_shelf);
 
+  SceneButton *puzzle_piece1 = new SceneButton(
+      652, 280, "puzzle_piece", "./res/scene3_mirror_puzzle_piece.png",
+      [&, this](SceneButton &obj)
+      {
+        Item puzzle_piece(9, 1, "Piece.");
+        AddItem("puzzle_piece", puzzle_piece);
+        obj.SetValid(false);
+      },
+      this);
+  scene1_shelf->AddSceneButton(puzzle_piece1);
+
   SceneButton *scene1_shelf_waterpot = new SceneButton(
       448, 162, "waterpot", "./res/scene2_shelf_waterpot.png",
       [waterpot, this](SceneButton &obj)
@@ -356,7 +376,7 @@ void MainWindow::Room2Init()
         Item item_waterpot(1, 1, "It's empty.");
         AddItem("waterpot", item_waterpot);
         obj.SetValid(false);
-        waterpot->SetValid(false);
+        SetValid("scene1", "waterpot", false);
       },
       this);
   scene1_shelf->AddSceneButton(scene1_shelf_waterpot);
@@ -365,10 +385,49 @@ void MainWindow::Room2Init()
       196, 212, "plant", "./res/scene2_shelf_plant.png",
       [&, this](SceneButton &obj)
       {
-        // QMessageBox::information(this, "", "plant");
+        if (obj.GetState() == "default" && inhand == "dirt")
+        {
+          Use("dirt");
+          obj.StateChange("dirt");
+        }
+        else if (obj.GetState() == "default" && inhand != "dirt")
+        {
+          ShowDescription("Need some dirt.");
+        }
+        else if (obj.GetState() == "dirt" && inhand == "finger")
+        {
+          Use("finger");
+          obj.StateChange("finger");
+        }
+        else if (obj.GetState() == "finger" && inhand == "waterpot_filled_with_blood")
+        {
+          Use("waterpot_filled_with_blood");
+          SetVisible("scene1_shelf", "hand", true);
+          obj.StateChange("dirt_hand");
+        }
       },
       this);
+  scene1_shelf_plant->AddState("dirt", "./res/scene2_shelf_plant_dirt.png");
+  scene1_shelf_plant->AddState("dirt_hand", "./res/scene2_shelf_plant_dirt.png");
+  scene1_shelf_plant->AddState("finger", "./res/scene2_shelf_plant_finger.png");
   scene1_shelf->AddSceneButton(scene1_shelf_plant);
+
+  SceneButton *scene1_shelf_hand = new SceneButton(
+      204, 172, "hand", "./res/scene2_shelf_plant_hand.png",
+      [&, this](SceneButton &obj)
+      {
+        if (obj.GetState() == "handle")
+        {
+          Item item_handle(1, 1, "A handle.");
+          AddItem("handle", item_handle);
+          obj.StateChange("default");
+        }
+      },
+      this);
+  scene1_shelf_hand->AddState("handle", "./res/scene2_shelf_plant_hand_handle.png");
+  scene1_shelf_hand->StateChange("handle");
+  scene1_shelf_hand->SetVisible(false);
+  scene1_shelf->AddSceneButton(scene1_shelf_hand);
 
   SceneButton *scene1_shelf_return_button = new SceneButton(
       448, 580, "down_arrow", "./res/down_arrow.png",
@@ -403,6 +462,18 @@ void MainWindow::Room2Init()
   scene1_nightstand_knife->SetVisible(false);
   scene1_nightstand->AddSceneButton(scene1_nightstand_knife);
 
+  SceneButton *puzzle_piece = new SceneButton(
+      604, 448, "puzzle_piece", "./res/puzzle_piece.png",
+      [&, this](SceneButton &obj)
+      {
+        Item puzzle_piece(9, 1, "Piece.");
+        AddItem("puzzle_piece", puzzle_piece);
+        obj.SetValid(false);
+      },
+      this);
+  puzzle_piece->SetVisible(false);
+  scene1_nightstand->AddSceneButton(puzzle_piece);
+
   SceneButton *scene1_nightstand_draw2 = new SceneButton(
       326, 440, "nightstand_draw2", "./res/scene2_nightstand_draw2_close.png",
       [&, this](SceneButton &obj)
@@ -410,28 +481,31 @@ void MainWindow::Room2Init()
         if (obj.GetState() == "default")
         {
           obj.StateChange("open");
+          SetVisible("scene1_nightstand", "puzzle_piece", true);
         }
         else if (obj.GetState() == "open")
         {
+          SetVisible("scene1_nightstand", "puzzle_piece", false);
           obj.StateChange("default");
         }
       },
       this);
   scene1_nightstand_draw2->AddState("open", "./res/scene2_nightstand_draw2.png");
   scene1_nightstand->AddSceneButton(scene1_nightstand_draw2);
+  puzzle_piece->Raise();
 
   SceneButton *scene1_nightstand_draw1 = new SceneButton(
       326, 312, "nightstand_draw1", "./res/scene2_nightstand_draw1_close.png",
-      [scene1_nightstand_knife, this](SceneButton &obj)
+      [&, this](SceneButton &obj)
       {
         if (obj.GetState() == "default")
         {
           obj.StateChange("open");
-          scene1_nightstand_knife->SetVisible(true);
+          SetVisible("scene1_nightstand", "nightstand_knife", true);
         }
         else if (obj.GetState() == "open")
         {
-          scene1_nightstand_knife->SetVisible(false);
+          SetVisible("scene1_nightstand", "nightstand_knife", false);
           obj.StateChange("default");
         }
       },
@@ -495,6 +569,9 @@ void MainWindow::Room3Init()
         Scenes[nowScene]->SceneShow();
       },
       this);
+  bookshelf->AddState("right_half", "./res/scene3_bookshelf_open_right_half.png");
+  bookshelf->AddState("left_half", "./res/scene3_bookshelf_open_left_half.png");
+  bookshelf->AddState("open", "./res/scene3_bookshelf_open.png");
   scene2->AddSceneButton(bookshelf);
 
   SceneButton *mirror = new SceneButton(
@@ -512,6 +589,17 @@ void MainWindow::Room3Init()
   Scene *scene3_mirror_mirror = new Scene("./res/scene3_mirror_mirror.png", "");
   AddScene("scene2_mirror", scene3_mirror_mirror);
 
+  SceneButton *puzzle_piece = new SceneButton(
+      620, 580, "puzzle_piece", "./res/scene3_mirror_puzzle_piece.png",
+      [&, this](SceneButton &obj)
+      {
+        Item puzzle_piece(9, 1, "Piece.");
+        AddItem("puzzle_piece", puzzle_piece);
+        obj.SetValid(false);
+      },
+      this);
+  scene3_mirror_mirror->AddSceneButton(puzzle_piece);
+
   SceneButton *scene3_mirror_mirror_hand = new SceneButton(
       620, 472, "hand", "./res/scene3_mirror_mirror_hand.png",
       [&, this](SceneButton &obj)
@@ -524,12 +612,12 @@ void MainWindow::Room3Init()
   scene3_mirror_mirror_hand->SetVisible(false);
 
   SceneButton *scene3_mirror_mirror_mirror = new SceneButton(
-      256, 38, "down_arrow", "./res/scene3_mirror_mirror_well.png",
+      256, 38, "scene3_mirror_mirror_well", "./res/scene3_mirror_mirror_well.png",
       [&, mirror, scene3_mirror_mirror_hand, this](SceneButton &obj)
       {
         if (obj.GetState() == "default")
         {
-          scene3_mirror_mirror_hand->SetVisible(true);
+          SetVisible("scene2_mirror", "hand", true);
           obj.StateChange("well_hand");
         }
         else if (obj.GetState() == "well_hand" && inhand == "knife")
@@ -542,12 +630,12 @@ void MainWindow::Room3Init()
         }
         else if (obj.GetState() == "well_hand")
         {
-          scene3_mirror_mirror_hand->SetVisible(false);
+          SetVisible("scene2_mirror", "hand", false);
           obj.StateChange("default");
         }
         else if (obj.GetState() == "broken_hand")
         {
-          scene3_mirror_mirror_hand->SetVisible(false);
+          SetVisible("scene2_mirror", "hand", false);
           obj.StateChange("broken");
         }
         else if (obj.GetState() == "broken")
@@ -574,8 +662,207 @@ void MainWindow::Room3Init()
       this);
   scene3_mirror_mirror->AddSceneButton(scene3_mirror_mirror_return_button);
 
+  Scene *scene2_bookshelf_paper = new Scene("./res/scene3_bookshelf_bookshelf_paper.png", "");
+  AddScene("scene2_bookshelf_paper", scene2_bookshelf_paper);
+
   Scene *scene3_bookshelf_bookshelf = new Scene("./res/scene3_bookshelf_bookshelf.png", "");
   AddScene("scene2_bookshelf", scene3_bookshelf_bookshelf);
+
+  SceneButton *scene3_bookshelf_bookshelf_paper_return_button = new SceneButton(
+      448, 580, "down_arrow", "./res/down_arrow.png",
+      [&, this](SceneButton &obj)
+      {
+        Scenes[nowScene]->SceneDisappear();
+        nowScene = "scene2_bookshelf";
+        Scenes[nowScene]->SceneShow();
+      },
+      this);
+  scene2_bookshelf_paper->AddSceneButton(scene3_bookshelf_bookshelf_paper_return_button);
+
+  SceneButton *scene3_bookshelf_bookshelf_key = new SceneButton(
+      321, 438, "scene3_bookshelf_bookshelf_key", "./res/key_blue.png",
+      [&, this](SceneButton &obj)
+      {
+        Item item_key(1, 1, "A blue key.");
+        AddItem("key_blue", item_key);
+        obj.SetValid(false);
+      },
+      this);
+  scene3_bookshelf_bookshelf->AddSceneButton(scene3_bookshelf_bookshelf_key);
+
+  SceneButton *scene3_bookshelf_bookshelf_puzzle_piece = new SceneButton(
+      421, 388, "scene3_bookshelf_bookshelf_puzzle_piece", "./res/puzzle_piece.png",
+      [&, this](SceneButton &obj)
+      {
+        Item puzzle_piece(9, 1, "Piece.");
+        AddItem("puzzle_piece", puzzle_piece);
+        obj.SetValid(false);
+      },
+      this);
+  scene3_bookshelf_bookshelf->AddSceneButton(scene3_bookshelf_bookshelf_puzzle_piece);
+
+  SceneButton *scene3_bookshelf_bookshelf_paper = new SceneButton(
+      760, 324, "scene3_bookshelf_bookshelf_paper", "./res/scene3_bookshelf_bookshelf_paper_item.png",
+      [&, this](SceneButton &obj)
+      {
+        Scenes[nowScene]->SceneDisappear();
+        nowScene = "scene2_bookshelf_paper";
+        Scenes[nowScene]->SceneShow();
+      },
+      this);
+  scene3_bookshelf_bookshelf->AddSceneButton(scene3_bookshelf_bookshelf_paper);
+
+  SceneButton *scene3_bookshelf_bookshelf_dirt = new SceneButton(
+      552, 324, "scene3_bookshelf_bookshelf_dirt", "./res/scene3_bookshelf_bookshelf_dirt.png",
+      [&, this](SceneButton &obj)
+      {
+        Item item_dirt(1, 1, "A bag of dirt.");
+        AddItem("dirt", item_dirt);
+        obj.SetValid(false);
+      },
+      this);
+  scene3_bookshelf_bookshelf->AddSceneButton(scene3_bookshelf_bookshelf_dirt);
+
+  SceneButton *scene3_bookshelf_bookshelf_board = new SceneButton(
+      97, 88, "scene3_bookshelf_bookshelf_board", "./res/scene3_bookshelf_bookshelf_board.png",
+      [&, this](SceneButton &obj)
+      {
+        if (CheckState("scene2_bookshelf", "lock_1", "6") &&
+            CheckState("scene2_bookshelf", "lock_2", "2") &&
+            CheckState("scene2_bookshelf", "lock_3", "1") &&
+            CheckState("scene2_bookshelf", "lock_4", "4") &&
+            CheckState("scene2_bookshelf", "lock_5", "3"))
+        {
+          SetValid("scene2_bookshelf", "lock_1", false);
+          SetValid("scene2_bookshelf", "lock_2", false);
+          SetValid("scene2_bookshelf", "lock_3", false);
+          SetValid("scene2_bookshelf", "lock_4", false);
+          SetValid("scene2_bookshelf", "lock_5", false);
+          obj.SetValid(false);
+          if (CheckState("scene2", "bookshelf", "default"))
+          {
+            SetState("scene2", "bookshelf", "left_half");
+          }
+          else if (CheckState("scene2", "bookshelf", "right_half"))
+          {
+            SetState("scene2", "bookshelf", "open");
+          }
+          ShowDescription("It's open!");
+        }
+      },
+      this);
+  scene3_bookshelf_bookshelf->AddSceneButton(scene3_bookshelf_bookshelf_board);
+
+  SceneButton *scene3_bookshelf_bookshelf_board_1 = new SceneButton(
+      521, 88, "scene3_bookshelf_bookshelf_board_1", "./res/scene3_bookshelf_bookshelf_board_1.png",
+      [&, this](SceneButton &obj)
+      {
+        if (inhand == "key")
+        {
+          obj.SetValid(false);
+          Use("key");
+          if (CheckState("scene2", "bookshelf", "default"))
+          {
+            SetState("scene2", "bookshelf", "right_half");
+          }
+          else if (CheckState("scene2", "bookshelf", "left_half"))
+          {
+            SetState("scene2", "bookshelf", "open");
+          }
+        }
+      },
+      this);
+  scene3_bookshelf_bookshelf->AddSceneButton(scene3_bookshelf_bookshelf_board_1);
+
+  SceneButton *lock_1 = new SceneButton(
+      292, 242, "lock_1", "./res/lock_0.png",
+      [&, this](SceneButton &obj)
+      {
+        obj.NextState();
+      },
+      this);
+  lock_1->AddState("1", "./res/lock_1.png");
+  lock_1->AddState("2", "./res/lock_2.png");
+  lock_1->AddState("3", "./res/lock_3.png");
+  lock_1->AddState("4", "./res/lock_4.png");
+  lock_1->AddState("5", "./res/lock_5.png");
+  lock_1->AddState("6", "./res/lock_6.png");
+  lock_1->AddState("7", "./res/lock_7.png");
+  lock_1->AddState("8", "./res/lock_8.png");
+  lock_1->AddState("9", "./res/lock_9.png");
+  scene3_bookshelf_bookshelf->AddSceneButton(lock_1);
+
+  SceneButton *lock_2 = new SceneButton(
+      333, 242, "lock_2", "./res/lock_0.png",
+      [&, this](SceneButton &obj)
+      {
+        obj.NextState();
+      },
+      this);
+  lock_2->AddState("1", "./res/lock_1.png");
+  lock_2->AddState("2", "./res/lock_2.png");
+  lock_2->AddState("3", "./res/lock_3.png");
+  lock_2->AddState("4", "./res/lock_4.png");
+  lock_2->AddState("5", "./res/lock_5.png");
+  lock_2->AddState("6", "./res/lock_6.png");
+  lock_2->AddState("7", "./res/lock_7.png");
+  lock_2->AddState("8", "./res/lock_8.png");
+  lock_2->AddState("9", "./res/lock_9.png");
+  scene3_bookshelf_bookshelf->AddSceneButton(lock_2);
+
+  SceneButton *lock_3 = new SceneButton(
+      374, 242, "lock_3", "./res/lock_0.png",
+      [&, this](SceneButton &obj)
+      {
+        obj.NextState();
+      },
+      this);
+  lock_3->AddState("1", "./res/lock_1.png");
+  lock_3->AddState("2", "./res/lock_2.png");
+  lock_3->AddState("3", "./res/lock_3.png");
+  lock_3->AddState("4", "./res/lock_4.png");
+  lock_3->AddState("5", "./res/lock_5.png");
+  lock_3->AddState("6", "./res/lock_6.png");
+  lock_3->AddState("7", "./res/lock_7.png");
+  lock_3->AddState("8", "./res/lock_8.png");
+  lock_3->AddState("9", "./res/lock_9.png");
+  scene3_bookshelf_bookshelf->AddSceneButton(lock_3);
+
+  SceneButton *lock_4 = new SceneButton(
+      415, 242, "lock_4", "./res/lock_0.png",
+      [&, this](SceneButton &obj)
+      {
+        obj.NextState();
+      },
+      this);
+  lock_4->AddState("1", "./res/lock_1.png");
+  lock_4->AddState("2", "./res/lock_2.png");
+  lock_4->AddState("3", "./res/lock_3.png");
+  lock_4->AddState("4", "./res/lock_4.png");
+  lock_4->AddState("5", "./res/lock_5.png");
+  lock_4->AddState("6", "./res/lock_6.png");
+  lock_4->AddState("7", "./res/lock_7.png");
+  lock_4->AddState("8", "./res/lock_8.png");
+  lock_4->AddState("9", "./res/lock_9.png");
+  scene3_bookshelf_bookshelf->AddSceneButton(lock_4);
+
+  SceneButton *lock_5 = new SceneButton(
+      456, 242, "lock_5", "./res/lock_0.png",
+      [&, this](SceneButton &obj)
+      {
+        obj.NextState();
+      },
+      this);
+  lock_5->AddState("1", "./res/lock_1.png");
+  lock_5->AddState("2", "./res/lock_2.png");
+  lock_5->AddState("3", "./res/lock_3.png");
+  lock_5->AddState("4", "./res/lock_4.png");
+  lock_5->AddState("5", "./res/lock_5.png");
+  lock_5->AddState("6", "./res/lock_6.png");
+  lock_5->AddState("7", "./res/lock_7.png");
+  lock_5->AddState("8", "./res/lock_8.png");
+  lock_5->AddState("9", "./res/lock_9.png");
+  scene3_bookshelf_bookshelf->AddSceneButton(lock_5);
 
   SceneButton *scene3_bookshelf_bookshelf_return_button = new SceneButton(
       448, 580, "down_arrow", "./res/down_arrow.png",
@@ -713,5 +1000,43 @@ void MainWindow::AddItem(std::string name, Item item)
   {
     bag[name] = item;
   }
+  int res = bag[name].GetRemain();
+  if (res > 0)
+  {
+    ShowDescription("There are " + std::to_string(res) + " left.");
+  }
   ToolbarRefresh();
+}
+
+bool MainWindow::CheckState(std::string scene_name, std::string button_name, std::string state)
+{
+  if (Scenes.find(scene_name) != Scenes.end())
+  {
+    return Scenes[scene_name]->CheckState(button_name, state);
+  }
+  return false;
+}
+
+void MainWindow::SetState(std::string scene_name, std::string button_name, std::string state)
+{
+  if (Scenes.find(scene_name) != Scenes.end())
+  {
+    Scenes[scene_name]->SetState(button_name, state);
+  }
+}
+
+void MainWindow::SetVisible(std::string scene_name, std::string button_name, bool state)
+{
+  if (Scenes.find(scene_name) != Scenes.end())
+  {
+    Scenes[scene_name]->SetVisible(button_name, state);
+  }
+}
+
+void MainWindow::SetValid(std::string scene_name, std::string button_name, bool state)
+{
+  if (Scenes.find(scene_name) != Scenes.end())
+  {
+    Scenes[scene_name]->SetValid(button_name, state);
+  }
 }

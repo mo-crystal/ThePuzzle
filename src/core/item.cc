@@ -15,7 +15,7 @@ Item::~Item()
 
 int Item::Use()
 {
-  if (need == now)
+  if (need <= now)
   {
     this->durability -= 1;
     if (durability <= 0)

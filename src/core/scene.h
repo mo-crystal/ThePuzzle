@@ -21,6 +21,10 @@ public:
   std::string GetSceneBGP() { return this->path_bgp; }
   void SceneDisappear();
   void SceneShow();
+  bool CheckState(std::string name, std::string state);
+  void SetState(std::string name, std::string state);
+  void SetVisible(std::string name, bool state);
+  void SetValid(std::string name, bool state);
 };
 
 #endif

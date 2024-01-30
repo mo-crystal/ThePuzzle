@@ -26,6 +26,8 @@ public:
   Item(int _need, int _durability, std::string _description);
   ~Item();
   int GetDurability() { return this->durability; }
+  int Getnow() { return this->now; }
+  int GetRemain() { return this->need - this->now >= 0 ? this->need - this->now : 0; }
   std::string GetDescription() { return this->description; }
   int Use();
   void Add();
