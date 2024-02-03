@@ -1,6 +1,7 @@
 add_rules("mode.debug", "mode.release")
 
 target("the_puzzle")
+    set_kind("binary") 
     add_rules("qt.widgetapp")
     add_frameworks("QtMultimedia")
     add_headerfiles("src/main/*.h")

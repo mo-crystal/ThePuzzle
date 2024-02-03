@@ -11,7 +11,6 @@
 
 #define DEFAULT_MAX_STACK 64
 
-class Construct;
 
 class Item
 {

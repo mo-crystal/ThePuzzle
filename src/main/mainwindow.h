@@ -19,7 +19,6 @@
 #include <QMouseEvent>
 #include <QTimer>
 
-
 #include "../core/scene.h"
 #include "../core/item.h"
 
@@ -29,6 +28,7 @@
 #define START_PAGE_BUTTON_WIDTH DEFUALT_WIDTH / 6
 #define TOOLBAR_SIZE 14
 #define DESCRIPTIONTIME 4000
+#define NOFOUND -2
 
 namespace Ui
 {
@@ -51,7 +51,7 @@ public:
   void handleDelayedKeyRelease();
   void mousePressEvent(QMouseEvent *event);
   void AddScene(std::string name, Scene *, bool default_scene = 0);
-  void Use(std::string item_name);
+  int Use(std::string item_name);
   void Init();
   void Room1Init();
   void Room2Init();
@@ -62,8 +62,8 @@ public:
   void AddItem(std::string name, Item item);
   bool CheckState(std::string scene_name, std::string button_name, std::string state);
   void SetState(std::string scene_name, std::string button_name, std::string state);
-  void SetVisible(std::string scene_name,std::string name, bool state);
-  void SetValid(std::string scene_name,std::string name, bool state);
+  void SetVisible(std::string scene_name, std::string name, bool state);
+  void SetValid(std::string scene_name, std::string name, bool state);
 
 private:
   Ui::MainWindow *ui;
@@ -75,6 +75,7 @@ private:
   bool isplaying = false;
   int FLASHTIMER;
   QTimer *description_label_timer = NULL;
+  std::map<std::string, std::vector<SceneButton*>> puzzles;
 
 private slots:
 };
