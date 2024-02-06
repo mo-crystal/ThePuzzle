@@ -19,6 +19,7 @@ public:
   ~Scene();
   void AddSceneButton(SceneButton *s);
   std::string GetSceneBGP() { return this->path_bgp; }
+  std::string GetSceneBGM() { return this->path_bgm; }
   void SceneDisappear();
   void SceneShow();
   bool CheckState(std::string name, std::string state);

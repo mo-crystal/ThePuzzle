@@ -12,6 +12,14 @@ MainWindow::MainWindow(QWidget *parent)
   description_label_timer->setInterval(DESCRIPTIONTIME);
   connect(description_label_timer, &QTimer::timeout, this, [=]()
           { ui->label->hide(); });
+  ShowToolbar(toolbarVisible);
+  mediaPlayer = new QMediaPlayer(this);
+  playlist = new QMediaPlaylist;
+  mediaPlayer->setPlaylist(playlist);
+  mediaPlayer->setVolume(50);
+  playlist->addMedia(QUrl::fromLocalFile("./res/music/bgm.mp3"));
+  playlist->setPlaybackMode(QMediaPlaylist::Loop);
+  mediaPlayer->play();
 }
 
 MainWindow::~MainWindow()
@@ -25,6 +33,7 @@ MainWindow::~MainWindow()
   {
     delete toolbar[i];
   }
+  delete mediaPlayer;
 }
 
 void MainWindow::timerEvent(QTimerEvent *event)
@@ -39,21 +48,24 @@ void MainWindow::paintEvent(QPaintEvent *event)
 {
   QPainter painter(this);
   QPixmap *p = new QPixmap(QString::fromStdString(Scenes[nowScene]->GetSceneBGP()));
-  painter.drawPixmap(0, 0, DEFUALT_WIDTH, DEFUALT_HEIGHT, *p);
-  QPixmap *p_tool = new QPixmap("./res/toolbar.png");
-  painter.drawPixmap(0, DEFUALT_HEIGHT, DEFUALT_WIDTH, DEFUALT_HEIGHT_TOOLBAR, *p_tool);
-  QPixmap *frame = new QPixmap(QString::fromStdString("./res/items/selectframe.png"));
-  for (int i = 0; i < TOOLBAR_SIZE; i++)
+  painter.drawPixmap(0, 0, p->width(), p->height(), *p);
+  if (toolbarVisible)
   {
-    if (toolbar[i]->GetName() == inhand && inhand != "")
+    QPixmap *frame, *p_tool;
+    frame = new QPixmap(QString::fromStdString("./res/items/selectframe.png"));
+    p_tool = new QPixmap("./res/toolbar.png");
+    painter.drawPixmap(0, DEFUALT_HEIGHT, DEFUALT_WIDTH, DEFUALT_HEIGHT_TOOLBAR, *p_tool);
+    for (int i = 0; i < TOOLBAR_SIZE; i++)
     {
-      painter.drawPixmap(36 + i * (8 + 56), 644, 56, 56, *frame);
+      if (toolbar[i]->GetName() == inhand && inhand != "")
+      {
+        painter.drawPixmap(36 + i * (8 + 56), 644, 56, 56, *frame);
+      }
     }
+    delete frame;
+    delete p_tool;
   }
-
   delete p;
-  delete frame;
-  delete p_tool;
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *event)
@@ -111,6 +123,7 @@ void MainWindow::Init()
     toolbar.push_back(temp);
   }
   ToolbarRefresh();
+  Start();
   Room1Init();
   Room2Init();
   Room3Init();
@@ -126,27 +139,35 @@ void MainWindow::AddScene(std::string name, Scene *s, bool default_scene)
   Scenes[name] = s;
   if (default_scene)
   {
-    if (Scenes.find(nowScene) != Scenes.end())
-    {
-      Scenes[nowScene]->SceneDisappear();
-    }
-    nowScene = name;
-    s->SceneShow();
+    SceneChange(name);
   }
+}
+
+void MainWindow::Start()
+{
+  Scene *start = new Scene("./res/start.png", "");
+  AddScene("start", start, 1);
+  SceneButton *start_button = new SceneButton(
+      360, 391, "start", "./res/startbutton.png",
+      [&, this](SceneButton &obj)
+      {
+        ShowToolbar(true);
+        SceneChange("scene");
+      },
+      this);
+  start->AddSceneButton(start_button);
 }
 
 void MainWindow::Room1Init()
 {
-  Scene *scene = new Scene("./res/bgp_scene1.png", "");
-  AddScene("scene", scene, 1);
+  Scene *scene = new Scene("./res/bgp_scene1.png", "./res/music/bgm.mp3");
+  AddScene("scene", scene);
 
   SceneButton *s1_desk = new SceneButton(
       0, 360, "desk", "./res/scene1_desk.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene_desk";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene_desk");
       },
       this);
   scene->AddSceneButton(s1_desk);
@@ -164,9 +185,7 @@ void MainWindow::Room1Init()
       596, 408, "bed", "./res/scene1_bed.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene1_nightstand";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene1_nightstand");
       },
       this);
   scene->AddSceneButton(s1_bed);
@@ -175,9 +194,7 @@ void MainWindow::Room1Init()
       844, 508, "nightstand", "./res/scene1_nightstand.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene1_nightstand";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene1_nightstand");
       },
       this);
   scene->AddSceneButton(s1_nightstand);
@@ -204,9 +221,7 @@ void MainWindow::Room1Init()
       10, 340, "left", "./res/left_arrow.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene3";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene3");
       },
       this);
   scene->AddSceneButton(left);
@@ -215,14 +230,12 @@ void MainWindow::Room1Init()
       900, 340, "right", "./res/right_arrow.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene1";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene1");
       },
       this);
   scene->AddSceneButton(right);
 
-  Scene *scene_desk = new Scene("./res/bgp_scene1_desk.png", "");
+  Scene *scene_desk = new Scene("./res/bgp_scene1_desk.png", "./res/music/bgm.mp3");
   AddScene("scene_desk", scene_desk);
 
   SceneButton *puzzle_piece = new SceneButton(
@@ -279,9 +292,7 @@ void MainWindow::Room1Init()
       448, 580, "down_arrow", "./res/down_arrow.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene");
       },
       this);
   scene_desk->AddSceneButton(scene_desk_return_button);
@@ -289,16 +300,14 @@ void MainWindow::Room1Init()
 
 void MainWindow::Room2Init()
 {
-  Scene *scene1 = new Scene("./res/scene2.png", "");
+  Scene *scene1 = new Scene("./res/scene2.png", "./res/music/bgm.mp3");
   AddScene("scene1", scene1);
 
   SceneButton *bed = new SceneButton(
       0, 360, "bed", "./res/scene2_bed.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene1_nightstand";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene1_nightstand");
       },
       this);
   scene1->AddSceneButton(bed);
@@ -307,9 +316,7 @@ void MainWindow::Room2Init()
       212, 408, "nightstand", "./res/scene2_nightstand.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene1_nightstand";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene1_nightstand");
       },
       this);
   scene1->AddSceneButton(nightstand);
@@ -318,9 +325,7 @@ void MainWindow::Room2Init()
       300, 164, "shelf", "./res/scene2_shelf.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene1_shelf";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene1_shelf");
       },
       this);
   scene1->AddSceneButton(shelf);
@@ -329,9 +334,7 @@ void MainWindow::Room2Init()
       418, 132, "waterpot", "./res/scene2_waterpot.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene1_shelf";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene1_shelf");
       },
       this);
   scene1->AddSceneButton(waterpot);
@@ -340,9 +343,7 @@ void MainWindow::Room2Init()
       340, 148, "plant", "./res/scene2_plant.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene1_shelf";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene1_shelf");
       },
       this);
   scene1->AddSceneButton(plant);
@@ -379,9 +380,7 @@ void MainWindow::Room2Init()
       10, 340, "left", "./res/left_arrow.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene");
       },
       this);
   scene1->AddSceneButton(left);
@@ -390,14 +389,12 @@ void MainWindow::Room2Init()
       900, 340, "right", "./res/right_arrow.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene2";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene2");
       },
       this);
   scene1->AddSceneButton(right);
 
-  Scene *scene1_shelf = new Scene("./res/bgp_scene2_shelf.png", "");
+  Scene *scene1_shelf = new Scene("./res/bgp_scene2_shelf.png", "./res/music/bgm.mp3");
   AddScene("scene1_shelf", scene1_shelf);
 
   SceneButton *puzzle_piece1 = new SceneButton(
@@ -475,14 +472,12 @@ void MainWindow::Room2Init()
       448, 580, "down_arrow", "./res/down_arrow.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene1";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene1");
       },
       this);
   scene1_shelf->AddSceneButton(scene1_shelf_return_button);
 
-  Scene *scene1_nightstand = new Scene("./res/bgp_scene2_nightstand.png", "");
+  Scene *scene1_nightstand = new Scene("./res/bgp_scene2_nightstand.png", "./res/music/bgm.mp3");
   AddScene("scene1_nightstand", scene1_nightstand);
 
   SceneButton *nightstand_puzzle_piece = new SceneButton(
@@ -600,9 +595,7 @@ void MainWindow::Room2Init()
       448, 580, "down_arrow", "./res/down_arrow.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene1";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene1");
       },
       this);
   scene1_nightstand->AddSceneButton(scene1_nightstand_return_button);
@@ -610,7 +603,7 @@ void MainWindow::Room2Init()
 
 void MainWindow::Room3Init()
 {
-  Scene *scene2 = new Scene("./res/bgp_blank.png", "");
+  Scene *scene2 = new Scene("./res/bgp_blank.png", "./res/music/bgm.mp3");
   AddScene("scene2", scene2);
 
   SceneButton *puzzle_piece1 = new SceneButton(
@@ -628,9 +621,7 @@ void MainWindow::Room3Init()
       32, 184, "bookshelf", "./res/scene3_bookshelf.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene2_bookshelf";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene2_bookshelf");
       },
       this);
   bookshelf->AddState("right_half", "./res/scene3_bookshelf_open_right_half.png");
@@ -642,15 +633,13 @@ void MainWindow::Room3Init()
       640, 192, "mirror", "./res/scene3_mirror.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene2_mirror";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene2_mirror");
       },
       this);
   mirror->AddState("broken", "./res/scene3_mirror_broken.png");
   scene2->AddSceneButton(mirror);
 
-  Scene *scene3_mirror_mirror = new Scene("./res/scene3_mirror_mirror.png", "");
+  Scene *scene3_mirror_mirror = new Scene("./res/scene3_mirror_mirror.png", "./res/music/bgm.mp3");
   AddScene("scene2_mirror", scene3_mirror_mirror);
 
   SceneButton *puzzle_piece = new SceneButton(
@@ -719,26 +708,22 @@ void MainWindow::Room3Init()
       448, 580, "down_arrow", "./res/down_arrow.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene2";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene2");
       },
       this);
   scene3_mirror_mirror->AddSceneButton(scene3_mirror_mirror_return_button);
 
-  Scene *scene2_bookshelf_paper = new Scene("./res/scene3_bookshelf_bookshelf_paper.png", "");
+  Scene *scene2_bookshelf_paper = new Scene("./res/scene3_bookshelf_bookshelf_paper.png", "./res/music/bgm.mp3");
   AddScene("scene2_bookshelf_paper", scene2_bookshelf_paper);
 
-  Scene *scene3_bookshelf_bookshelf = new Scene("./res/scene3_bookshelf_bookshelf.png", "");
+  Scene *scene3_bookshelf_bookshelf = new Scene("./res/scene3_bookshelf_bookshelf.png", "./res/music/bgm.mp3");
   AddScene("scene2_bookshelf", scene3_bookshelf_bookshelf);
 
   SceneButton *scene3_bookshelf_bookshelf_paper_return_button = new SceneButton(
       448, 580, "down_arrow", "./res/down_arrow.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene2_bookshelf";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene2_bookshelf");
       },
       this);
   scene2_bookshelf_paper->AddSceneButton(scene3_bookshelf_bookshelf_paper_return_button);
@@ -769,9 +754,7 @@ void MainWindow::Room3Init()
       760, 324, "scene3_bookshelf_bookshelf_paper", "./res/scene3_bookshelf_bookshelf_paper_item.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene2_bookshelf_paper";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene2_bookshelf_paper");
       },
       this);
   scene3_bookshelf_bookshelf->AddSceneButton(scene3_bookshelf_bookshelf_paper);
@@ -932,9 +915,7 @@ void MainWindow::Room3Init()
       448, 580, "down_arrow", "./res/down_arrow.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene2";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene2");
       },
       this);
   scene3_bookshelf_bookshelf->AddSceneButton(scene3_bookshelf_bookshelf_return_button);
@@ -943,9 +924,7 @@ void MainWindow::Room3Init()
       10, 340, "left_arrow", "./res/left_arrow.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene1";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene1");
       },
       this);
   scene2->AddSceneButton(left);
@@ -954,9 +933,7 @@ void MainWindow::Room3Init()
       900, 340, "right_arrow", "./res/right_arrow.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene3";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene3");
       },
       this);
   scene2->AddSceneButton(right);
@@ -964,13 +941,13 @@ void MainWindow::Room3Init()
 
 void MainWindow::Room4Init()
 {
-  Scene *scene3 = new Scene("./res/bgp_blank.png", "");
+  Scene *scene3 = new Scene("./res/bgp_blank.png", "./res/music/bgm.mp3");
   AddScene("scene3", scene3);
 
   Scene *scene4_door_door = new Scene("./res/scene4_door_door.png", "");
   AddScene("scene4_door", scene4_door_door);
 
-  Scene *scene4_puzzle_puzzle = new Scene("./res/scene4_puzzle_bgp.png", "");
+  Scene *scene4_puzzle_puzzle = new Scene("./res/scene4_puzzle_bgp.png", "./res/music/bgm.mp3");
   AddScene("scene4_puzzle", scene4_puzzle_puzzle);
 
   SceneButton *piece1 = new SceneButton(
@@ -1210,8 +1187,8 @@ void MainWindow::Room4Init()
       280, 120, "puzzle_puzzle", "./res/scene4_puzzle_bgp_puzzle.png",
       [&, this](SceneButton &obj)
       {
-        if (obj.GetState() == "default"&& inhand == "puzzle_piece" && Use("puzzle_piece") != NOTENOUGH)
-        { 
+        if (obj.GetState() == "default" && inhand == "puzzle_piece" && Use("puzzle_piece") != NOTENOUGH)
+        {
           SetState("scene3", "puzzle", "unfinished");
           SetVisible("scene4_puzzle", "piece1", true);
           SetVisible("scene4_puzzle", "piece2", true);
@@ -1223,6 +1200,7 @@ void MainWindow::Room4Init()
           SetVisible("scene4_puzzle", "piece8", true);
           SetVisible("scene4_puzzle", "piece9", true);
           obj.StateChange("start");
+          SetState("scene3", "puzzlex", "find_all");
         }
         else if (obj.GetState() == "start")
         {
@@ -1242,7 +1220,7 @@ void MainWindow::Room4Init()
             puzzles["scene4_puzzle"][i]->SetVisible(false);
           }
           obj.StateChange("finished");
-          SetState("scene3", "puzzle", "done");
+          SetState("scene3", "puzzlex", "done");
           SetVisible("scene4_puzzle", "screwdriver", true);
           ShowDescription("Done!");
         }
@@ -1278,9 +1256,7 @@ void MainWindow::Room4Init()
       448, 580, "scene_puzzle_down_arrow", "./res/down_arrow.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene3";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene3");
       },
       this);
   scene4_puzzle_puzzle->AddSceneButton(scene_puzzle_return_button);
@@ -1305,7 +1281,7 @@ void MainWindow::Room4Init()
           obj.StateChange("with_handle_fixed");
           ShowDescription("Done.");
         }
-        else if (obj.GetState() == "with_handle" )
+        else if (obj.GetState() == "with_handle")
         {
           ShowDescription("Maybe I need a screwdriver.");
         }
@@ -1316,9 +1292,7 @@ void MainWindow::Room4Init()
         }
         else if (obj.GetState() == "open")
         {
-          Scenes[nowScene]->SceneDisappear();
-          nowScene = "scene4_door";
-          Scenes[nowScene]->SceneShow();
+          SceneChange("scene4_door");
         }
       },
       this);
@@ -1328,25 +1302,21 @@ void MainWindow::Room4Init()
   scene3->AddSceneButton(door);
 
   SceneButton *puzzle = new SceneButton(
-      100, 240, "puzzle", "./res/scene4_puzzle.png",
+      100, 240, "puzzlex", "./res/scene4_puzzle.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene4_puzzle";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene4_puzzle");
       },
       this);
-  puzzle->AddState("find_all", "scene4_puzzle_unfinished.png");
-  puzzle->AddState("done", "scene4_puzzle_finished.png");
+  puzzle->AddState("find_all", "./res/scene4_puzzle_unfinished.png");
+  puzzle->AddState("done", "./res/scene4_puzzle_finished.png");
   scene3->AddSceneButton(puzzle);
 
   SceneButton *desk = new SceneButton(
       800, 340, "desk", "./res/scene3_desk.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene_desk";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene_desk");
       },
       this);
 
@@ -1356,9 +1326,7 @@ void MainWindow::Room4Init()
       10, 340, "left_arrow", "./res/left_arrow.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene2";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene2");
       },
       this);
   scene3->AddSceneButton(left);
@@ -1367,9 +1335,7 @@ void MainWindow::Room4Init()
       900, 340, "right_arrow", "./res/right_arrow.png",
       [&, this](SceneButton &obj)
       {
-        Scenes[nowScene]->SceneDisappear();
-        nowScene = "scene";
-        Scenes[nowScene]->SceneShow();
+        SceneChange("scene");
       },
       this);
   scene3->AddSceneButton(right);
@@ -1459,5 +1425,41 @@ void MainWindow::SetValid(std::string scene_name, std::string button_name, bool 
   if (Scenes.find(scene_name) != Scenes.end())
   {
     Scenes[scene_name]->SetValid(button_name, state);
+  }
+}
+
+void MainWindow::ShowToolbar(bool state)
+{
+  toolbarVisible = state;
+  for (int i = 0; i < toolbar.size(); i++)
+  {
+    toolbar[i]->SetVisible(state);
+  }
+}
+
+void MainWindow::SceneChange(std::string scene_name)
+{
+  std::string bgm = "";
+  if (Scenes.find(nowScene) != Scenes.end())
+  {
+    Scenes[nowScene]->SceneDisappear();
+    bgm = Scenes[nowScene]->GetSceneBGM();
+  }
+
+  if (Scenes.find(scene_name) == Scenes.end())
+  {
+    return;
+  }
+
+  nowScene = scene_name;
+  Scenes[nowScene]->SceneShow();
+  if (Scenes[nowScene]->GetSceneBGM() != bgm)
+  {
+    QString path = QString::fromStdString(Scenes[nowScene]->GetSceneBGM());
+    //QMessageBox::information(this,"",path);
+    playlist->clear();
+    playlist->addMedia(QUrl::fromLocalFile(path));
+    mediaPlayer->setPlaylist(playlist);
+    mediaPlayer->play();
   }
 }

@@ -64,6 +64,9 @@ public:
   void SetState(std::string scene_name, std::string button_name, std::string state);
   void SetVisible(std::string scene_name, std::string name, bool state);
   void SetValid(std::string scene_name, std::string name, bool state);
+  void Start();
+  void ShowToolbar(bool state);
+  void SceneChange(std::string scene_name);
 
 private:
   Ui::MainWindow *ui;
@@ -75,8 +78,10 @@ private:
   bool isplaying = false;
   int FLASHTIMER;
   QTimer *description_label_timer = NULL;
-  std::map<std::string, std::vector<SceneButton*>> puzzles;
-
+  std::map<std::string, std::vector<SceneButton *>> puzzles;
+  bool toolbarVisible = false;
+  QMediaPlayer *mediaPlayer;
+  QMediaPlaylist *playlist;
 private slots:
 };
 
