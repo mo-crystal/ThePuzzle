@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
   playlist = new QMediaPlaylist;
   mediaPlayer->setPlaylist(playlist);
   mediaPlayer->setVolume(50);
-  playlist->addMedia(QUrl::fromLocalFile("./res/music/bgm.mp3"));
+  playlist->addMedia(QUrl::fromLocalFile("./res/music/start.mp3"));
   playlist->setPlaybackMode(QMediaPlaylist::Loop);
   mediaPlayer->play();
 }
@@ -212,6 +212,7 @@ void MainWindow::Room1Init()
       239, 124, "window", "./res/scene1_window.png",
       [&, this](SceneButton &obj)
       {
+        QSound::play("./res/music/bird.wav");
         ShowDescription(obj.GetDescription());
       },
       this, "Am I on an island?");
@@ -242,6 +243,7 @@ void MainWindow::Room1Init()
       652, 420, "puzzle_piece", "./res/puzzle_piece.png",
       [&, this](SceneButton &obj)
       {
+        QSound::play("./res/music/piece.wav");
         Item puzzle_piece(8, 1, "Piece.");
         AddItem("puzzle_piece", puzzle_piece);
         obj.SetValid(false);
@@ -253,6 +255,7 @@ void MainWindow::Room1Init()
       640, 128, "puzzle_piece1", "./res/puzzle_piece2.png",
       [&, this](SceneButton &obj)
       {
+        QSound::play("./res/music/piece.wav");
         Item puzzle_piece(8, 1, "Piece.");
         AddItem("puzzle_piece", puzzle_piece);
         obj.SetValid(false);
@@ -268,16 +271,19 @@ void MainWindow::Room1Init()
         if (obj.GetState() == "default" && inhand == "key_blue")
         {
           Use("key_blue");
+          QSound::play("./res/music/unlock.wav");
           obj.StateChange("unlock");
           ShowDescription("Unlocked!");
         }
         else if (obj.GetState() == "unlock")
         {
+          QSound::play("./res/music/drawer_open.wav");
           obj.StateChange("open");
           SetVisible("scene_desk", "puzzle_piece1", true);
         }
         else if (obj.GetState() == "open")
         {
+          QSound::play("./res/music/drawer_close.wav");
           obj.StateChange("unlock");
           SetVisible("scene_desk", "puzzle_piece1", false);
         }
@@ -356,10 +362,12 @@ void MainWindow::Room2Init()
         {
           Use("knife");
           obj.StateChange("blood");
+          QSound::play("./res/music/paint.wav");
         }
         else if (obj.GetState() == "blood" && inhand == "waterpot")
         {
           Use("waterpot");
+          QSound::play("./res/music/get_water.wav");
           Item waterpot_filled_with_blood(1, 1, "Filled with blood.");
           AddItem("waterpot_filled_with_blood", waterpot_filled_with_blood);
         }
@@ -401,6 +409,7 @@ void MainWindow::Room2Init()
       652, 280, "puzzle_piece", "./res/scene3_mirror_puzzle_piece.png",
       [&, this](SceneButton &obj)
       {
+        QSound::play("./res/music/piece.wav");
         Item puzzle_piece(8, 1, "Piece.");
         AddItem("puzzle_piece", puzzle_piece);
         obj.SetValid(false);
@@ -412,6 +421,7 @@ void MainWindow::Room2Init()
       448, 162, "waterpot", "./res/scene2_shelf_waterpot.png",
       [waterpot, this](SceneButton &obj)
       {
+        QSound::play("./res/music/pot.wav");
         Item item_waterpot(1, 1, "It's empty.");
         AddItem("waterpot", item_waterpot);
         obj.SetValid(false);
@@ -427,6 +437,7 @@ void MainWindow::Room2Init()
         if (obj.GetState() == "default" && inhand == "dirt")
         {
           Use("dirt");
+          QSound::play("./res/music/dirt.wav");
           obj.StateChange("dirt");
         }
         else if (obj.GetState() == "default" && inhand != "dirt")
@@ -440,7 +451,9 @@ void MainWindow::Room2Init()
         }
         else if (obj.GetState() == "finger" && inhand == "waterpot_filled_with_blood")
         {
+          QSound::play("./res/music/water.wav");
           Use("waterpot_filled_with_blood");
+          QSound::play("./res/music/grow.wav");
           SetVisible("scene1_shelf", "hand", true);
           obj.StateChange("dirt_hand");
         }
@@ -457,6 +470,7 @@ void MainWindow::Room2Init()
       {
         if (obj.GetState() == "handle")
         {
+          QSound::play("./res/music/key.wav");
           Item item_handle(1, 1, "A handle.");
           AddItem("handle", item_handle);
           obj.StateChange("default");
@@ -484,6 +498,7 @@ void MainWindow::Room2Init()
       112, 88, "nightstand_puzzle_piece", "./res/scene3_mirror_puzzle_piece.png",
       [&, this](SceneButton &obj)
       {
+        QSound::play("./res/music/piece.wav");
         Item puzzle_piece1(8, 1, "Piece.");
         AddItem("puzzle_piece", puzzle_piece1);
         obj.SetValid(false);
@@ -502,6 +517,8 @@ void MainWindow::Room2Init()
       376, 384, "nightstand_knife", "./res/scene2_nightstand_knife.png",
       [&, this](SceneButton &obj)
       {
+        QSound::play("./res/music/knife.wav");
+
         Item item_knife(1, 2, "It's so sharp it looks like it can cut into another world.");
         AddItem("knife", item_knife);
         obj.SetValid(false);
@@ -514,6 +531,7 @@ void MainWindow::Room2Init()
       604, 448, "puzzle_piece", "./res/puzzle_piece.png",
       [&, this](SceneButton &obj)
       {
+        QSound::play("./res/music/piece.wav");
         Item puzzle_piece(8, 1, "Piece.");
         AddItem("puzzle_piece", puzzle_piece);
         obj.SetValid(false);
@@ -529,10 +547,12 @@ void MainWindow::Room2Init()
         if (obj.GetState() == "default")
         {
           obj.StateChange("open");
+          QSound::play("./res/music/drawer_open.wav");
           SetVisible("scene1_nightstand", "puzzle_piece", true);
         }
         else if (obj.GetState() == "open")
         {
+          QSound::play("./res/music/drawer_close.wav");
           SetVisible("scene1_nightstand", "puzzle_piece", false);
           obj.StateChange("default");
         }
@@ -548,11 +568,13 @@ void MainWindow::Room2Init()
       {
         if (obj.GetState() == "default")
         {
+          QSound::play("./res/music/drawer_open.wav");
           obj.StateChange("open");
           SetVisible("scene1_nightstand", "nightstand_knife", true);
         }
         else if (obj.GetState() == "open")
         {
+          QSound::play("./res/music/drawer_close.wav");
           SetVisible("scene1_nightstand", "nightstand_knife", false);
           obj.StateChange("default");
         }
@@ -567,6 +589,7 @@ void MainWindow::Room2Init()
       56, 364, "nightstand_key", "./res/scene2_nightstand_key.png",
       [&, this](SceneButton &obj)
       {
+        QSound::play("./res/music/key.wav");
         Item item_key(1, 1, "Now I need a keyhole.");
         AddItem("key", item_key);
         obj.SetValid(false);
@@ -580,11 +603,13 @@ void MainWindow::Room2Init()
       {
         if (!obj.IsMoved())
         {
+          QSound::play("./res/music/pillow.wav");
           obj.GetButton()->move(6, 100);
           obj.GetLabel()->move(6, 100);
         }
         else
         {
+          QSound::play("./res/music/pillow.wav");
           obj.LocationReset();
         }
       },
@@ -610,6 +635,7 @@ void MainWindow::Room3Init()
       52, 172, "puzzle_piece1", "./res/scene3_mirror_puzzle_piece.png",
       [&, this](SceneButton &obj)
       {
+        QSound::play("./res/music/piece.wav");
         Item puzzle_piece(8, 1, "Piece.");
         AddItem("puzzle_piece", puzzle_piece);
         obj.SetValid(false);
@@ -646,6 +672,7 @@ void MainWindow::Room3Init()
       620, 580, "puzzle_piece", "./res/scene3_mirror_puzzle_piece.png",
       [&, this](SceneButton &obj)
       {
+        QSound::play("./res/music/piece.wav");
         Item puzzle_piece(8, 1, "Piece.");
         AddItem("puzzle_piece", puzzle_piece);
         obj.SetValid(false);
@@ -676,6 +703,7 @@ void MainWindow::Room3Init()
         else if (obj.GetState() == "well_hand" && inhand == "knife")
         {
           Use("knife");
+          QSound::play("./res/music/mirror.wav");
           Item item_finger(1, 1, "I'm so glad it's not mine.");
           AddItem("finger", item_finger);
           mirror->StateChange("broken");
@@ -732,6 +760,7 @@ void MainWindow::Room3Init()
       321, 438, "scene3_bookshelf_bookshelf_key", "./res/key_blue.png",
       [&, this](SceneButton &obj)
       {
+        QSound::play("./res/music/key.wav");
         Item item_key(1, 1, "A blue key.");
         AddItem("key_blue", item_key);
         obj.SetValid(false);
@@ -743,6 +772,7 @@ void MainWindow::Room3Init()
       421, 388, "scene3_bookshelf_bookshelf_puzzle_piece", "./res/puzzle_piece.png",
       [&, this](SceneButton &obj)
       {
+        QSound::play("./res/music/piece.wav");
         Item puzzle_piece(8, 1, "Piece.");
         AddItem("puzzle_piece", puzzle_piece);
         obj.SetValid(false);
@@ -763,6 +793,7 @@ void MainWindow::Room3Init()
       552, 324, "scene3_bookshelf_bookshelf_dirt", "./res/scene3_bookshelf_bookshelf_dirt.png",
       [&, this](SceneButton &obj)
       {
+        QSound::play("./res/music/dirt.wav");
         Item item_dirt(1, 1, "A bag of dirt.");
         AddItem("dirt", item_dirt);
         obj.SetValid(false);
@@ -794,6 +825,7 @@ void MainWindow::Room3Init()
           {
             SetState("scene2", "bookshelf", "open");
           }
+          QSound::play("./res/music/unlock.wav");
           ShowDescription("It's open!");
         }
       },
@@ -808,6 +840,7 @@ void MainWindow::Room3Init()
         {
           obj.SetValid(false);
           Use("key");
+          QSound::play("./res/music/unlock.wav");
           if (CheckState("scene2", "bookshelf", "default"))
           {
             SetState("scene2", "bookshelf", "right_half");
@@ -825,6 +858,7 @@ void MainWindow::Room3Init()
       292, 242, "lock_1", "./res/lock_0.png",
       [&, this](SceneButton &obj)
       {
+        QSound::play("./res/music/lock_dial.wav");
         obj.NextState();
       },
       this);
@@ -843,6 +877,7 @@ void MainWindow::Room3Init()
       333, 242, "lock_2", "./res/lock_0.png",
       [&, this](SceneButton &obj)
       {
+        QSound::play("./res/music/lock_dial.wav");
         obj.NextState();
       },
       this);
@@ -861,6 +896,7 @@ void MainWindow::Room3Init()
       374, 242, "lock_3", "./res/lock_0.png",
       [&, this](SceneButton &obj)
       {
+        QSound::play("./res/music/lock_dial.wav");
         obj.NextState();
       },
       this);
@@ -879,6 +915,7 @@ void MainWindow::Room3Init()
       415, 242, "lock_4", "./res/lock_0.png",
       [&, this](SceneButton &obj)
       {
+        QSound::play("./res/music/lock_dial.wav");
         obj.NextState();
       },
       this);
@@ -897,6 +934,7 @@ void MainWindow::Room3Init()
       456, 242, "lock_5", "./res/lock_0.png",
       [&, this](SceneButton &obj)
       {
+        QSound::play("./res/music/lock_dial.wav");
         obj.NextState();
       },
       this);
@@ -944,7 +982,7 @@ void MainWindow::Room4Init()
   Scene *scene3 = new Scene("./res/bgp_blank.png", "./res/music/bgm.mp3");
   AddScene("scene3", scene3);
 
-  Scene *scene4_door_door = new Scene("./res/scene4_door_door.png", "");
+  Scene *scene4_door_door = new Scene("./res/end.png", "./res/music/bgm.mp3");
   AddScene("scene4_door", scene4_door_door);
 
   Scene *scene4_puzzle_puzzle = new Scene("./res/scene4_puzzle_bgp.png", "./res/music/bgm.mp3");
@@ -956,11 +994,13 @@ void MainWindow::Room4Init()
       {
         if (puzzles["scene4_puzzle"][1]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece2", obj.GetState());
           obj.StateChange("default");
         }
         else if (puzzles["scene4_puzzle"][3]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece4", obj.GetState());
           obj.StateChange("default");
         }
@@ -974,16 +1014,19 @@ void MainWindow::Room4Init()
       {
         if (puzzles["scene4_puzzle"][0]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece1", obj.GetState());
           obj.StateChange("default");
         }
         else if (puzzles["scene4_puzzle"][2]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece3", obj.GetState());
           obj.StateChange("default");
         }
         else if (puzzles["scene4_puzzle"][4]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece5", obj.GetState());
           obj.StateChange("default");
         }
@@ -997,11 +1040,13 @@ void MainWindow::Room4Init()
       {
         if (puzzles["scene4_puzzle"][1]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece2", obj.GetState());
           obj.StateChange("default");
         }
         else if (puzzles["scene4_puzzle"][5]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece6", obj.GetState());
           obj.StateChange("default");
         }
@@ -1015,16 +1060,19 @@ void MainWindow::Room4Init()
       {
         if (puzzles["scene4_puzzle"][0]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece1", obj.GetState());
           obj.StateChange("default");
         }
         else if (puzzles["scene4_puzzle"][6]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece7", obj.GetState());
           obj.StateChange("default");
         }
         else if (puzzles["scene4_puzzle"][4]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece5", obj.GetState());
           obj.StateChange("default");
         }
@@ -1038,21 +1086,25 @@ void MainWindow::Room4Init()
       {
         if (puzzles["scene4_puzzle"][1]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece2", obj.GetState());
           obj.StateChange("default");
         }
         else if (puzzles["scene4_puzzle"][3]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece4", obj.GetState());
           obj.StateChange("default");
         }
         else if (puzzles["scene4_puzzle"][5]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece6", obj.GetState());
           obj.StateChange("default");
         }
         else if (puzzles["scene4_puzzle"][7]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece8", obj.GetState());
           obj.StateChange("default");
         }
@@ -1066,16 +1118,19 @@ void MainWindow::Room4Init()
       {
         if (puzzles["scene4_puzzle"][2]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece3", obj.GetState());
           obj.StateChange("default");
         }
         else if (puzzles["scene4_puzzle"][4]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece5", obj.GetState());
           obj.StateChange("default");
         }
         else if (puzzles["scene4_puzzle"][8]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece9", obj.GetState());
           obj.StateChange("default");
         }
@@ -1089,11 +1144,13 @@ void MainWindow::Room4Init()
       {
         if (puzzles["scene4_puzzle"][3]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece4", obj.GetState());
           obj.StateChange("default");
         }
         else if (puzzles["scene4_puzzle"][7]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece8", obj.GetState());
           obj.StateChange("default");
         }
@@ -1107,16 +1164,19 @@ void MainWindow::Room4Init()
       {
         if (puzzles["scene4_puzzle"][4]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece5", obj.GetState());
           obj.StateChange("default");
         }
         else if (puzzles["scene4_puzzle"][6]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece7", obj.GetState());
           obj.StateChange("default");
         }
         else if (puzzles["scene4_puzzle"][8]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece9", obj.GetState());
           obj.StateChange("default");
         }
@@ -1130,11 +1190,13 @@ void MainWindow::Room4Init()
       {
         if (puzzles["scene4_puzzle"][5]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece6", obj.GetState());
           obj.StateChange("default");
         }
         else if (puzzles["scene4_puzzle"][7]->GetState() == "default")
         {
+          QSound::play("./res/music/piece_drag.wav");
           SetState("scene4_puzzle", "piece8", obj.GetState());
           obj.StateChange("default");
         }
@@ -1199,6 +1261,7 @@ void MainWindow::Room4Init()
           SetVisible("scene4_puzzle", "piece7", true);
           SetVisible("scene4_puzzle", "piece8", true);
           SetVisible("scene4_puzzle", "piece9", true);
+          QSound::play("./res/music/piece.wav");
           obj.StateChange("start");
           SetState("scene3", "puzzlex", "find_all");
         }
@@ -1219,6 +1282,7 @@ void MainWindow::Room4Init()
           {
             puzzles["scene4_puzzle"][i]->SetVisible(false);
           }
+          QSound::play("./res/music/unlock.wav");
           obj.StateChange("finished");
           SetState("scene3", "puzzlex", "done");
           SetVisible("scene4_puzzle", "screwdriver", true);
@@ -1268,31 +1332,42 @@ void MainWindow::Room4Init()
         if (obj.GetState() == "default" && inhand == "handle")
         {
           Use("handle");
+          QSound::play("./res/music/handle.wav");
           obj.StateChange("with_handle");
           ShowDescription("Still needs to be reinforced.");
         }
         else if (obj.GetState() == "default")
         {
-          ShowDescription("The handle is missing.");
+          QSound::play("./res/music/door.wav");
+          ShowDescription("Nobody is there and the handle is missing.");
         }
         else if (obj.GetState() == "with_handle" && inhand == "screwdriver")
         {
+          QSound::play("./res/music/screwdriver.wav");
           Use("screwdriver");
           obj.StateChange("with_handle_fixed");
           ShowDescription("Done.");
         }
         else if (obj.GetState() == "with_handle")
         {
+          QSound::play("./res/music/door_block.wav");
           ShowDescription("Maybe I need a screwdriver.");
         }
 
         else if (obj.GetState() == "with_handle_fixed")
         {
           obj.StateChange("open");
+          QSound::play("./res/music/door_open.wav");
         }
         else if (obj.GetState() == "open")
         {
+          ShowToolbar(false);
           SceneChange("scene4_door");
+          QTimer::singleShot(4000, [&]()
+                             {
+           SceneChange("start");
+           QMessageBox::information(this,"warning","重置函数暂未完成，请重新打开程序以开始新游戏");   
+         });
         }
       },
       this);
@@ -1456,7 +1531,6 @@ void MainWindow::SceneChange(std::string scene_name)
   if (Scenes[nowScene]->GetSceneBGM() != bgm)
   {
     QString path = QString::fromStdString(Scenes[nowScene]->GetSceneBGM());
-    //QMessageBox::information(this,"",path);
     playlist->clear();
     playlist->addMedia(QUrl::fromLocalFile(path));
     mediaPlayer->setPlaylist(playlist);

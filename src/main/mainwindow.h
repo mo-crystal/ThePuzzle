@@ -18,6 +18,8 @@
 #include <QMediaPlayer>
 #include <QMouseEvent>
 #include <QTimer>
+#include <QSound>
+#include <QProcess>
 
 #include "../core/scene.h"
 #include "../core/item.h"
