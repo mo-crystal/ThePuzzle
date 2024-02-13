@@ -26,6 +26,7 @@ public:
   void SetState(std::string name, std::string state);
   void SetVisible(std::string name, bool state);
   void SetValid(std::string name, bool state);
+  void Reset();
 };
 
 #endif

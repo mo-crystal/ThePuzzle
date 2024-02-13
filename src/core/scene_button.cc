@@ -1,6 +1,6 @@
 #include "scene_button.h"
 
-SceneButton::SceneButton(double _x, double _y, double _size_x, double _size_y, std::string _name, std::string _path, std::function<void(SceneButton &)> _onClick, QWidget *parent, std::string descrip)
+SceneButton::SceneButton(double _x, double _y, double _size_x, double _size_y, std::string _name, std::string _path, std::function<void(SceneButton &)> _onClick, QWidget *parent, std::string descrip, bool visible)
     : QWidget(parent)
 {
   this->x = _x;
@@ -11,10 +11,10 @@ SceneButton::SceneButton(double _x, double _y, double _size_x, double _size_y, s
   this->path = _path;
   this->onClick = _onClick;
   this->description = descrip;
-
   QPixmap p(QString::fromStdString(path));
   label = new QLabel(parent);
   button = new QPushButton(parent);
+  this->init_visible = visible;
 
   movie = new QMovie(QString::fromStdString(path));
   label->setMovie(movie);
@@ -42,9 +42,11 @@ SceneButton::SceneButton(double _x, double _y, double _size_x, double _size_y, s
                    { emit clicked(*this); });
   QObject::connect(this, &SceneButton::clicked, onClick);
   movie->start();
+
+  SetVisible(init_visible);
 }
 
-SceneButton::SceneButton(double _x, double _y, std::string _name, std::string _path, std::function<void(SceneButton &)> _onClick, QWidget *parent, std::string descrip)
+SceneButton::SceneButton(double _x, double _y, std::string _name, std::string _path, std::function<void(SceneButton &)> _onClick, QWidget *parent, std::string descrip, bool visible)
     : QWidget(parent)
 {
   this->x = _x;
@@ -53,6 +55,7 @@ SceneButton::SceneButton(double _x, double _y, std::string _name, std::string _p
   this->onClick = _onClick;
   this->name = _name;
   this->description = descrip;
+  this->init_visible = visible;
 
   QPixmap p(QString::fromStdString(path));
 
@@ -85,6 +88,7 @@ SceneButton::SceneButton(double _x, double _y, std::string _name, std::string _p
                    { emit clicked(*this); });
   QObject::connect(this, &SceneButton::clicked, onClick);
   movie->start();
+  SetVisible(init_visible);
 }
 
 SceneButton::~SceneButton()
@@ -154,4 +158,24 @@ void SceneButton::NextState()
     it = states.begin();
   }
   StateChange((*it).first);
+}
+
+void SceneButton::ResetAll()
+{
+  SetVisible(init_visible);
+  LocationReset();
+  SetValid(true);
+  StateChange(init_state);
+}
+
+void SceneButton::SetInitVisible(bool state)
+{
+  init_visible = state;
+  SetVisible(state);
+}
+
+void SceneButton::SetInitState(std::string state)
+{
+  init_state = state;
+  StateChange(state);
 }

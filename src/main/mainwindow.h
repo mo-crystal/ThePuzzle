@@ -69,7 +69,8 @@ public:
   void Start();
   void ShowToolbar(bool state);
   void SceneChange(std::string scene_name);
-
+  void Reset();
+  void InitPuzzle(std::string puzzle_name);
 private:
   Ui::MainWindow *ui;
   std::map<std::string, Scene *> Scenes;

@@ -88,3 +88,11 @@ void Scene::SetValid(std::string name, bool state)
     }
   }
 }
+
+void Scene::Reset()
+{
+  for (int i = 0; i < scene_buttons.size(); i++)
+  {
+    scene_buttons[i]->ResetAll();
+  }
+}

@@ -30,12 +30,13 @@ private:
   std::map<std::string, std::string> states;
   std::string nowstate = "default";
   std::string description = "Nothing.";
-
+  bool init_visible = true;
+  std::string init_state = "default";
 public:
   explicit SceneButton(
-      double _x, double _y, double _size_x, double _size_y, std::string _name, std::string _path, std::function<void(SceneButton &)> _onClick, QWidget *parent, std::string descrip = "Nothing.");
+      double _x, double _y, double _size_x, double _size_y, std::string _name, std::string _path, std::function<void(SceneButton &)> _onClick, QWidget *parent, std::string descrip = "Nothing.", bool _visible = true);
   explicit SceneButton(
-      double _x, double _y, std::string _name, std::string _path, std::function<void(SceneButton &)> _onClick, QWidget *parent, std::string descrip = "Nothing.");
+      double _x, double _y, std::string _name, std::string _path, std::function<void(SceneButton &)> _onClick, QWidget *parent, std::string descrip = "Nothing.", bool _visible = true);
   ~SceneButton();
   std::string GetName() { return this->name; }
   std::string GetPath() { return this->path; }
@@ -90,6 +91,9 @@ public:
   void SetDescription(std::string descrip) { this->description = descrip; }
   std::string GetDescription() { return description; }
   void NextState();
+  void ResetAll();
+  void SetInitVisible(bool state);
+  void SetInitState(std::string state);
 signals:
   void clicked(SceneButton &);
 };

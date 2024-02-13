@@ -147,6 +147,26 @@ void MainWindow::Start()
 {
   Scene *start = new Scene("./res/start.png", "");
   AddScene("start", start, 1);
+
+  SceneButton *music = new SceneButton(
+      864, 4, "music", "./res/music.png",
+      [&, this](SceneButton &obj)
+      {
+        if (obj.GetState() == "default")
+        {
+          obj.StateChange("ban");
+          mediaPlayer->setVolume(0);
+        }
+        else
+        {
+          obj.StateChange("default");
+          mediaPlayer->setVolume(50);
+        }
+      },
+      this);
+  music->AddState("ban", "./res/music_banned.png");
+  start->AddSceneButton(music);
+
   SceneButton *start_button = new SceneButton(
       360, 391, "start", "./res/startbutton.png",
       [&, this](SceneButton &obj)
@@ -261,7 +281,7 @@ void MainWindow::Room1Init()
         obj.SetValid(false);
       },
       this);
-  puzzle_piece1->SetVisible(false);
+  puzzle_piece1->SetInitVisible(false);
   scene_desk->AddSceneButton(puzzle_piece1);
 
   SceneButton *draw = new SceneButton(
@@ -478,8 +498,8 @@ void MainWindow::Room2Init()
       },
       this);
   scene1_shelf_hand->AddState("handle", "./res/scene2_shelf_plant_hand_handle.png");
-  scene1_shelf_hand->StateChange("handle");
-  scene1_shelf_hand->SetVisible(false);
+  scene1_shelf_hand->SetInitState("handle");
+  scene1_shelf_hand->SetInitVisible(false);
   scene1_shelf->AddSceneButton(scene1_shelf_hand);
 
   SceneButton *scene1_shelf_return_button = new SceneButton(
@@ -524,7 +544,7 @@ void MainWindow::Room2Init()
         obj.SetValid(false);
       },
       this);
-  scene1_nightstand_knife->SetVisible(false);
+  scene1_nightstand_knife->SetInitVisible(false);
   scene1_nightstand->AddSceneButton(scene1_nightstand_knife);
 
   SceneButton *puzzle_piece = new SceneButton(
@@ -537,7 +557,7 @@ void MainWindow::Room2Init()
         obj.SetValid(false);
       },
       this);
-  puzzle_piece->SetVisible(false);
+  puzzle_piece->SetInitVisible(false);
   scene1_nightstand->AddSceneButton(puzzle_piece);
 
   SceneButton *scene1_nightstand_draw2 = new SceneButton(
@@ -689,7 +709,7 @@ void MainWindow::Room3Init()
       this, "I don't want to hurt myself.");
   scene3_mirror_mirror->AddSceneButton(scene3_mirror_mirror_hand);
 
-  scene3_mirror_mirror_hand->SetVisible(false);
+  scene3_mirror_mirror_hand->SetInitVisible(false);
 
   SceneButton *scene3_mirror_mirror_mirror = new SceneButton(
       256, 38, "scene3_mirror_mirror_well", "./res/scene3_mirror_mirror_well.png",
@@ -1214,36 +1234,7 @@ void MainWindow::Room4Init()
   puzzles["scene4_puzzle"].push_back(piece8);
   puzzles["scene4_puzzle"].push_back(piece9);
 
-  std::vector<int> nums = {0, 1, 2, 3, 4, 5, 6, 7, 8};
-  std::random_shuffle(nums.begin(), nums.end());
-  int inversions = 0;
-
-  for (int i = 0; i < nums.size() - 1; ++i)
-  {
-    for (int j = i + 1; j < nums.size(); ++j)
-    {
-      if (nums[i] > nums[j])
-      {
-        inversions++;
-      }
-    }
-  }
-
-  if (inversions % 2 != 0)
-  {
-    std::swap(nums[nums.size() - 2], nums[nums.size() - 1]);
-  }
-
-  for (int i = 0; i < puzzles["scene4_puzzle"].size(); i++)
-  {
-    puzzles["scene4_puzzle"][i]->SetVisible(false);
-    for (int j = 1; j <= 9; j++)
-    {
-      std::string path = "./res/scene4_puzzle_piece_" + std::to_string(j) + ".png";
-      puzzles["scene4_puzzle"][i]->AddState(std::to_string(j), path);
-    }
-    puzzles["scene4_puzzle"][i]->StateChange(std::to_string(nums[i]));
-  }
+  InitPuzzle("scene4_puzzle");
 
   SceneButton *puzzle_puzzle = new SceneButton(
       280, 120, "puzzle_puzzle", "./res/scene4_puzzle_bgp_puzzle.png",
@@ -1313,7 +1304,7 @@ void MainWindow::Room4Init()
         obj.SetValid(false);
       },
       this);
-  screwdriver->SetVisible(false);
+  screwdriver->SetInitVisible(false);
   scene4_puzzle_puzzle->AddSceneButton(screwdriver);
 
   SceneButton *scene_puzzle_return_button = new SceneButton(
@@ -1338,6 +1329,7 @@ void MainWindow::Room4Init()
         }
         else if (obj.GetState() == "default")
         {
+
           QSound::play("./res/music/door.wav");
           ShowDescription("Nobody is there and the handle is missing.");
         }
@@ -1365,9 +1357,8 @@ void MainWindow::Room4Init()
           SceneChange("scene4_door");
           QTimer::singleShot(4000, [&]()
                              {
-           SceneChange("start");
-           QMessageBox::information(this,"warning","重置函数暂未完成，请重新打开程序以开始新游戏");   
-         });
+           Reset();
+           SceneChange("start"); });
         }
       },
       this);
@@ -1535,5 +1526,57 @@ void MainWindow::SceneChange(std::string scene_name)
     playlist->addMedia(QUrl::fromLocalFile(path));
     mediaPlayer->setPlaylist(playlist);
     mediaPlayer->play();
+  }
+}
+
+void MainWindow::Reset()
+{
+  for (auto i = Scenes.begin(); i != Scenes.end(); i++)
+  {
+    (*i).second->Reset();
+    (*i).second->SceneDisappear();
+  }
+
+  bag.clear();
+  ToolbarRefresh();
+}
+
+void MainWindow::InitPuzzle(std::string puzzle_name)
+{
+  if (puzzle_name == "scene4_puzzle")
+  {
+    std::vector<int> nums = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    std::random_shuffle(nums.begin(), nums.end());
+    int inversions = 0;
+    for (int i = 0; i < nums.size() - 1; ++i)
+    {
+      for (int j = i + 1; j < nums.size(); ++j)
+      {
+        if (nums[i] > nums[j])
+        {
+          inversions++;
+        }
+      }
+    }
+
+    if (inversions % 2 != 0)
+    {
+      std::swap(nums[nums.size() - 2], nums[nums.size() - 1]);
+    }
+
+    for (int i = 0; i < puzzles["scene4_puzzle"].size(); i++)
+    {
+      puzzles["scene4_puzzle"][i]->SetInitVisible(false);
+      for (int j = 1; j <= 9; j++)
+      {
+        std::string path = "./res/scene4_puzzle_piece_" + std::to_string(j) + ".png";
+        puzzles["scene4_puzzle"][i]->AddState(std::to_string(j), path);
+      }
+      if (nums[i] == 0)
+      {
+        continue;
+      }
+      puzzles["scene4_puzzle"][i]->SetInitState(std::to_string(nums[i]));
+    }
   }
 }
