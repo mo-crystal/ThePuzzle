@@ -55,10 +55,6 @@ public:
   void AddScene(std::string name, Scene *, bool default_scene = 0);
   int Use(std::string item_name);
   void Init();
-  void Room1Init();
-  void Room2Init();
-  void Room3Init();
-  void Room4Init();
   void ToolbarRefresh();
   void ShowDescription(std::string descrip);
   void AddItem(std::string name, Item item);
@@ -66,11 +62,10 @@ public:
   void SetState(std::string scene_name, std::string button_name, std::string state);
   void SetVisible(std::string scene_name, std::string name, bool state);
   void SetValid(std::string scene_name, std::string name, bool state);
-  void Start();
   void ShowToolbar(bool state);
   void SceneChange(std::string scene_name);
   void Reset();
-  void InitPuzzle(std::string puzzle_name);
+
 private:
   Ui::MainWindow *ui;
   std::map<std::string, Scene *> Scenes;
