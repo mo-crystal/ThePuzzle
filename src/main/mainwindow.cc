@@ -6,7 +6,6 @@ MainWindow::MainWindow(QWidget *parent)
   ui->setupUi(this);
   ui->stackedWidget->setStyleSheet("background-color: transparent;");
   ui->label->setVisible(false);
-  Init();
   FLASHTIMER = startTimer(100);
   description_label_timer = new QTimer(this);
   description_label_timer->setInterval(DESCRIPTIONTIME);
@@ -17,9 +16,9 @@ MainWindow::MainWindow(QWidget *parent)
   playlist = new QMediaPlaylist;
   mediaPlayer->setPlaylist(playlist);
   mediaPlayer->setVolume(50);
-  playlist->addMedia(QUrl::fromLocalFile("./res/music/start.mp3"));
   playlist->setPlaybackMode(QMediaPlaylist::Loop);
   mediaPlayer->play();
+  Init();
 }
 
 MainWindow::~MainWindow()
@@ -145,7 +144,7 @@ void MainWindow::AddScene(std::string name, Scene *s, bool default_scene)
 
 void MainWindow::Start()
 {
-  Scene *start = new Scene("./res/start.png", "");
+  Scene *start = new Scene("./res/start.png", "./res/music/start.mp3");
   AddScene("start", start, 1);
 
   SceneButton *music = new SceneButton(

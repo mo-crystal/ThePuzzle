@@ -42,8 +42,6 @@ class MainWindow : public QMainWindow
   Q_OBJECT
 
 public:
-  std::string nowScene;
-
   explicit MainWindow(QWidget *parent = 0);
   ~MainWindow();
   void paintEvent(QPaintEvent *event);
@@ -71,7 +69,9 @@ public:
   void SceneChange(std::string scene_name);
   void Reset();
   void InitPuzzle(std::string puzzle_name);
+
 private:
+  std::string nowScene = "";
   Ui::MainWindow *ui;
   std::map<std::string, Scene *> Scenes;
   std::vector<SceneButton *> toolbar;
